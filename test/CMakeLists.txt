@@ -74,4 +74,7 @@ TARGET_LINK_LIBRARIES(Tests
     libgmock
 )
 
+add_custom_command(TARGET Tests PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/matrix ${CMAKE_CURRENT_BINARY_DIR}/matrix)
+
 add_test(NAME Tests COMMAND Tests)
