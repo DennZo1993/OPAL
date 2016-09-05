@@ -29,6 +29,6 @@ matrix:
 script:
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
   - make CXX=$COMPILER
   - make test
