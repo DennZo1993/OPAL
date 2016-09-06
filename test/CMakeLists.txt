@@ -75,6 +75,10 @@ TARGET_LINK_LIBRARIES(Tests
 )
 
 add_custom_command(TARGET Tests PRE_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/matrix ${CMAKE_CURRENT_BINARY_DIR}/matrix)
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                   ${CMAKE_CURRENT_SOURCE_DIR}/matrix ${CMAKE_CURRENT_BINARY_DIR}/matrix)
+add_custom_command(TARGET Tests PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
+                   ${CMAKE_CURRENT_SOURCE_DIR}/DatabaseFiles.txt ${CMAKE_CURRENT_BINARY_DIR}/DatabaseFiles.txt)
 
 add_test(NAME Tests COMMAND Tests)

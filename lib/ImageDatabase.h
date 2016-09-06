@@ -15,8 +15,7 @@ public:
   using ImageType = Matrix<ImagePixelType>;
   using SegmentationType = Matrix<SegmentationPixelType>;
 
-  ImageDatabase() {
-  }
+  ImageDatabase() {}
 
   void Add(const std::string &imageFileName, const std::string &segFileName) {
     Matrix<ImagePixelType> imgMat;
@@ -31,15 +30,23 @@ public:
            "Image and segmentation databases must have the same size!");
   }
 
-  void ReadFilesFromList(const std::string &fileName) {
+  void AppendFilesFromList(const std::string &fileName) {
     std::ifstream ifs(fileName);
+    if (ifs.fail())
+      return;
+
     std::string imageFileName, segFileName;
     while (ifs >> imageFileName) {
-      if (!ifs >> segFileName)
+      if (!(ifs >> segFileName))
         break;
       Add(imageFileName, segFileName);
     }
     ifs.close();
+  }
+
+  void ReadFilesFromList(const std::string &fileName) {
+    Clear();
+    AppendFilesFromList(fileName);
   }
 
   void Clear() {
@@ -48,12 +55,12 @@ public:
   }
 
   const ImageType &getImage(int i) const {
-    assert(i > 0 && i < images.size() && "Index out of range!");
+    assert(i >= 0 && i < images.size() && "Index out of range!");
     return images[i];
   }
 
   const SegmentationType &getSegmentation(int i) const {
-    assert(i > 0 && i < segmentations.size() && "Index out of range!");
+    assert(i >= 0 && i < segmentations.size() && "Index out of range!");
     return segmentations[i];
   }
 
