@@ -219,6 +219,7 @@ public:
   }
 
   friend std::istream &operator>>(std::istream &is, Matrix<T> &m) {
+    std::ios_base::sync_with_stdio(false);
     int h, w;
     is >> h >> w;
     m.AllocateAndFill(h, w, 0);
@@ -229,12 +230,13 @@ public:
   }
 
   friend std::ostream &operator<<(std::ostream &os, const Matrix<T> &m) {
+    std::ios_base::sync_with_stdio(false);
     for (int i = 0; i < m.getHeight(); ++i) {
       for (int j = 0; j < m.getWidth(); ++j) {
         os.width(3);
         os << m[i][j];
       }
-      os << std::endl;
+      os << '\n';
     }
     return os;
   }
@@ -273,15 +275,6 @@ public:
     else
       AllocateRandomizedHorizontal(windowSize);
   }
-
-  virtual void ReadFromFile(const std::string &fileName) {
-    GenericReadFromFile(fileName, "%d");
-  }
-
-  virtual void SaveToFile(const std::string &fileName) const {
-    GenericSaveToFile(fileName, "%d");
-  }
-
 
   void PRINT_SSD(const Matrix<T> &other, unsigned i1, unsigned j1, unsigned i2, unsigned j2,
     int patchRadX, int patchRadY = 0) {
@@ -367,56 +360,7 @@ private:
     Height = Width = 0;
   }
 
-  void GenericReadFromFile(const std::string &fileName, const std::string &format) {
-    // Release the memory.
-    Destroy();
-    // Try to open the file and allocate memory on success.
-    FILE *f = fopen(fileName.c_str(), "r");
-    if (!f)
-      return;
-
-    fscanf(f, "%d %d", &Height, &Width);
-    AllocateAndFill(Height, Width, 0);
-    for (int i = 0; i < Height; ++i)
-      for (int j = 0; j < Width; ++j)
-        fscanf(f, format.c_str(), &data[i][j]);
-
-    fclose(f);
-  }
-
-  void GenericSaveToFile(const std::string &fileName, const std::string &format) const {
-    FILE *f = fopen(fileName.c_str(), "w");
-    if (!f)
-      return;
-
-    std::string formatWithSpace = format + " ";
-    std::string formatWithNewline = format + "\n";
-    fprintf(f, "%d %d\n", Height, Width);
-    for (int i = 0; i < Height; ++i) {
-      for (int j = 0; j < Width - 1; ++j)
-        fprintf(f, formatWithSpace.c_str(), data[i][j]);
-      fprintf(f, formatWithNewline.c_str(), data[i][Width - 1]);
-    }
-
-    fclose(f);
-  }
-
   int Height;
   int Width;
   T **data;
 };
-
-
-
-
-
-// Specification.
-template<>
-void Matrix<double>::ReadFromFile(const std::string &fileName) {
-  GenericReadFromFile(fileName, "%lf");
-}
-
-template<>
-void Matrix<double>::SaveToFile(const std::string &fileName) const {
-  GenericSaveToFile(fileName, "%lf");
-}

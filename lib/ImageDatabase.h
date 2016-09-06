@@ -18,16 +18,24 @@ public:
   ImageDatabase() {}
 
   void Add(const std::string &imageFileName, const std::string &segFileName) {
-    Matrix<ImagePixelType> imgMat;
-    imgMat.ReadFromFile(imageFileName);
-    images.push_back(imgMat);
+    std::ifstream ifsImg(imageFileName);
+    std::ifstream ifsSeg(segFileName);
+    if (ifsImg.fail() || ifsSeg.fail())
+      return;
 
+    Matrix<ImagePixelType> imgMat;
     Matrix<SegmentationPixelType> segMat;
-    segMat.ReadFromFile(segFileName);
+
+    ifsImg >> imgMat;
+    ifsSeg >> segMat;
+    images.push_back(imgMat);
     segmentations.push_back(segMat);
 
     assert(images.size() == segmentations.size() &&
            "Image and segmentation databases must have the same size!");
+
+    ifsImg.close();
+    ifsSeg.close();
   }
 
   void AppendFilesFromList(const std::string &fileName) {
