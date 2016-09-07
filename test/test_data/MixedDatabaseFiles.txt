@@ -1,0 +1,2 @@
+test_data/pictures/small_4x5_color.png
+test_data/matrix/4x5_twos_int.txt
