@@ -3,7 +3,7 @@
 
 TEST(ImageDatabaseTests, TestLoadMatrixImage) {
   ImageDatabase<double, int> db;
-  db.Add("matrix/3x4_ones_float.txt", "matrix/3x4_ones_int.txt");
+  db.Add("test_data/matrix/3x4_ones_float.txt", "test_data/matrix/3x4_ones_int.txt");
 
   ASSERT_EQ(1, db.getImageCount());
 
@@ -22,9 +22,9 @@ TEST(ImageDatabaseTests, TestLoadMatrixImage) {
   }
 }
 
-TEST(ImageDatabaseTest, TestLoadMatrixImagesFromList) {
+TEST(ImageDatabaseTests, TestLoadMatrixImagesFromList) {
   ImageDatabase<double, int> db;
-  db.ReadFilesFromList("DatabaseFiles.txt");
+  db.ReadFilesFromList("test_data/DatabaseFiles.txt");
 
   ASSERT_EQ(2, db.getImageCount());
 
@@ -48,12 +48,12 @@ TEST(ImageDatabaseTest, TestLoadMatrixImagesFromList) {
 TEST(ImageDatabaseTests, TestAppendMatrixImagesFromList) {
   ImageDatabase<double, int> db;
   // First read.
-  db.ReadFilesFromList("DatabaseFiles.txt");
+  db.ReadFilesFromList("test_data/DatabaseFiles.txt");
   ASSERT_EQ(2, db.getImageCount());
   // Read destroys previously added images.
-  db.ReadFilesFromList("DatabaseFiles.txt");
+  db.ReadFilesFromList("test_data/DatabaseFiles.txt");
   ASSERT_EQ(2, db.getImageCount());
   // Append does not.
-  db.AppendFilesFromList("DatabaseFiles.txt");
+  db.AppendFilesFromList("test_data/DatabaseFiles.txt");
   ASSERT_EQ(4, db.getImageCount());
 }

@@ -155,7 +155,7 @@ TEST(MatrixTests, TestCastTo) {
 TEST(MatrixTests, TestReadFloat) {
   // Float-type matrix.
   Matrix<double> floatMat;
-  std::ifstream ifs("matrix/3x4_ones_float.txt");
+  std::ifstream ifs("test_data/matrix/3x4_ones_float.txt");
   ifs >> floatMat;
 
   ASSERT_EQ(3, floatMat.getHeight());
@@ -172,7 +172,7 @@ TEST(MatrixTests, TestReadFloat) {
 TEST(MatrixTests, TestReadInt) {
   // Integer matrix.
   Matrix<int> intMat;
-  std::ifstream ifs("matrix/3x4_ones_int.txt");
+  std::ifstream ifs("test_data/matrix/3x4_ones_int.txt");
   ifs >> intMat;
   ASSERT_EQ(3, intMat.getHeight());
   ASSERT_EQ(4, intMat.getWidth());
@@ -188,8 +188,8 @@ TEST(MatrixTests, TestReadInt) {
 TEST(MatrixTests, TestReadAndSumFloat) {
   Matrix<double> ones;
   Matrix<double> twos;
-  std::ifstream ifs1("matrix/3x4_ones_float.txt");
-  std::ifstream ifs2("matrix/3x4_twos_float.txt");
+  std::ifstream ifs1("test_data/matrix/3x4_ones_float.txt");
+  std::ifstream ifs2("test_data/matrix/3x4_twos_float.txt");
   ifs1 >> ones;
   ifs2 >> twos;
 
@@ -217,8 +217,8 @@ TEST(MatrixTests, TestReadAndSumFloat) {
 TEST(MatrixTests, TestReadAndSumInt) {
   Matrix<int> ones;
   Matrix<int> twos;
-  std::ifstream ifs1("matrix/3x4_ones_int.txt");
-  std::ifstream ifs2("matrix/3x4_twos_int.txt");
+  std::ifstream ifs1("test_data/matrix/3x4_ones_int.txt");
+  std::ifstream ifs2("test_data/matrix/3x4_twos_int.txt");
   ifs1 >> ones;
   ifs2 >> twos;
 
@@ -246,8 +246,8 @@ TEST(MatrixTests, TestReadAndSumInt) {
 TEST(MatrixTests, TestReadAndSubtractFloat) {
   Matrix<double> ones;
   Matrix<double> twos;
-  std::ifstream ifs1("matrix/3x4_ones_float.txt");
-  std::ifstream ifs2("matrix/3x4_twos_float.txt");
+  std::ifstream ifs1("test_data/matrix/3x4_ones_float.txt");
+  std::ifstream ifs2("test_data/matrix/3x4_twos_float.txt");
   ifs1 >> ones;
   ifs2 >> twos;
 
@@ -275,8 +275,8 @@ TEST(MatrixTests, TestReadAndSubtractFloat) {
 TEST(MatrixTests, TestReadAndSubtractInt) {
   Matrix<int> ones;
   Matrix<int> twos;
-  std::ifstream ifs1("matrix/3x4_ones_int.txt");
-  std::ifstream ifs2("matrix/3x4_twos_int.txt");
+  std::ifstream ifs1("test_data/matrix/3x4_ones_int.txt");
+  std::ifstream ifs2("test_data/matrix/3x4_twos_int.txt");
   ifs1 >> ones;
   ifs2 >> twos;
 
