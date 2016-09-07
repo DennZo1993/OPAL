@@ -2,6 +2,156 @@
 #include "Matrix.h"
 #include <fstream>
 
+// =====
+// Allocation tests.
+// =====
+TEST(MatrixTests, TestAllocationViaConstructor) {
+  {
+    // Empty matrix.
+    Matrix<double> m1;
+    ASSERT_TRUE(m1.isEmpty());
+    ASSERT_EQ(0, m1.getHeight());
+    ASSERT_EQ(0, m1.getWidth());
+    m1.AllocateAndFill(20, 10, 5.0);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(20, m1.getHeight());
+    ASSERT_EQ(10, m1.getWidth());
+  }
+  {
+    // Non-empty matrix via constructor.
+    Matrix<int> m1(5, 10, 2);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(5, m1.getHeight());
+    ASSERT_EQ(10, m1.getWidth());
+
+    Matrix<int> m2(m1);
+    ASSERT_FALSE(m2.isEmpty());
+    ASSERT_EQ(5, m2.getHeight());
+    ASSERT_EQ(10, m2.getWidth());
+  }
+  {
+    // Empty matrix via constructor.
+    Matrix<double> m1;
+    ASSERT_TRUE(m1.isEmpty());
+    ASSERT_EQ(0, m1.getHeight());
+    ASSERT_EQ(0, m1.getWidth());
+    Matrix<double> m2(m1);
+    ASSERT_TRUE(m2.isEmpty());
+    ASSERT_EQ(0, m2.getHeight());
+    ASSERT_EQ(0, m2.getWidth());
+  }
+}
+
+TEST(MatrixTests, TestReallocation) {
+  {
+    // Test explicit reallocation - shrink.
+    Matrix<int> m1(5, 10, 2);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(5, m1.getHeight());
+    ASSERT_EQ(10, m1.getWidth());
+    m1.AllocateAndFill(1, 1, 5);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(1, m1.getHeight());
+    ASSERT_EQ(1, m1.getWidth());
+  }
+  {
+    // Test reallocation to empty.
+    Matrix<int> m1(5, 10, 2);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(5, m1.getHeight());
+    ASSERT_EQ(10, m1.getWidth());
+    m1.AllocateAndFill(20, 0, 4);
+    ASSERT_TRUE(m1.isEmpty());
+    ASSERT_EQ(0, m1.getHeight());
+    ASSERT_EQ(0, m1.getWidth());
+
+    Matrix<int> m2(5, 10, 2);
+    ASSERT_FALSE(m2.isEmpty());
+    ASSERT_EQ(5, m2.getHeight());
+    ASSERT_EQ(10, m2.getWidth());
+    m2.AllocateAndFill(0, 40, 1);
+    ASSERT_TRUE(m2.isEmpty());
+    ASSERT_EQ(0, m2.getHeight());
+    ASSERT_EQ(0, m2.getWidth());
+
+    Matrix<int> m3(5, 10, 2);
+    ASSERT_FALSE(m3.isEmpty());
+    ASSERT_EQ(5, m3.getHeight());
+    ASSERT_EQ(10, m3.getWidth());
+    m3.AllocateAndFill(0, 0, 4);
+    ASSERT_TRUE(m3.isEmpty());
+    ASSERT_EQ(0, m3.getHeight());
+    ASSERT_EQ(0, m3.getWidth());
+  }
+  {
+    // Test explicit reallocation - grow.
+    Matrix<int> m1(1, 1, 2);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(1, m1.getHeight());
+    ASSERT_EQ(1, m1.getWidth());
+    m1.AllocateAndFill(10, 20, 5);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(10, m1.getHeight());
+    ASSERT_EQ(20, m1.getWidth());
+  }
+  {
+    // Test reallocation via assignment - grow.
+    Matrix<double> m1(2, 3, 5.0);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(2, m1.getHeight());
+    ASSERT_EQ(3, m1.getWidth());
+    Matrix<double> m2(15, 30, 10.0);
+    ASSERT_FALSE(m2.isEmpty());
+    ASSERT_EQ(15, m2.getHeight());
+    ASSERT_EQ(30, m2.getWidth());
+    m1 = m2;
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(15, m1.getHeight());
+    ASSERT_EQ(30, m1.getWidth());
+    for (int i = 0; i < m1.getHeight(); ++i)
+      for (int j = 0; j < m1.getWidth(); ++j)
+        ASSERT_DOUBLE_EQ(10.0, m1[i][j]);
+  }
+  {
+    // Test reallocation via assignment - shrink.
+    Matrix<double> m1(2, 3, 5.0);
+    ASSERT_FALSE(m1.isEmpty());
+    ASSERT_EQ(2, m1.getHeight());
+    ASSERT_EQ(3, m1.getWidth());
+    Matrix<double> m2;
+    m1 = m2;
+    ASSERT_TRUE(m1.isEmpty());
+    ASSERT_EQ(0, m1.getHeight());
+    ASSERT_EQ(0, m1.getWidth());
+  }
+}
+
+TEST(MatrixTests, TestCastTo) {
+  {
+    // Test casting non-empty matrix. Floor.
+    Matrix<double> m1(2, 3, 1.3);
+    Matrix<int> m2 = m1.castTo<int>();
+    ASSERT_FALSE(m2.isEmpty());
+    ASSERT_EQ(2, m2.getHeight());
+    ASSERT_EQ(3, m2.getWidth());
+    for (int i = 0; i < m2.getHeight(); ++i)
+      for (int j = 0; j < m2.getWidth(); ++j)
+        ASSERT_EQ(1, m2[i][j]);
+  }
+  {
+    // Test casting empty matrix.
+    Matrix<double> m1;
+    Matrix<int> m2 = m1.castTo<int>();
+    ASSERT_TRUE(m2.isEmpty());
+    ASSERT_EQ(0, m2.getHeight());
+    ASSERT_EQ(0, m2.getWidth());
+  }
+}
+
+// =====
+// Read + arithmetics tests.
+// =====
+
 TEST(MatrixTests, TestReadFloat) {
   // Float-type matrix.
   Matrix<double> floatMat;

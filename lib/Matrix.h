@@ -39,12 +39,18 @@ public:
     for (int i = 0; i < Height; ++i)
       for (int j = 0; j < Width; ++j)
         result[i][j] = static_cast<U>(data[i][j]);
-    
+
     return result;
   }
 
   inline int getHeight() const { return Height; }
   inline int getWidth() const { return Width; }
+
+  inline bool isEmpty() const {
+    assert((!data || (Height > 0 && Width > 0)) &&
+           "Zero-matrix size with non-null data!");
+    return data == nullptr;
+  }
 
   // Operators.
   Matrix<T> &operator=(Matrix<T> other) {
@@ -121,7 +127,7 @@ public:
 
   // SSD between patches.
   T SSD(const Matrix<T> &other, unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-      int patchRadX, int patchRadY = 0) {
+        int patchRadX, int patchRadY = 0) {
     if (!patchRadY)
       patchRadY = patchRadX;
     assert(i1 >= patchRadY && i2 >= patchRadY &&
@@ -140,7 +146,7 @@ public:
 
   // Returns known SSD shifted 1 pixel right.
   T SSD_ShiftedRight(const Matrix<T> &other, unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-             int patchRadX, int patchRadY, T knownSSD) {
+                     int patchRadX, int patchRadY, T knownSSD) {
     assert(i1 >= patchRadY && i2 >= patchRadY &&
       i1 + patchRadY < Height && i2 + patchRadY < other.getHeight());
     assert(j1 > patchRadX && j2 > patchRadX &&
@@ -163,7 +169,7 @@ public:
 
   // Returns known SSD shifted 1 pixel left.
   T SSD_ShiftedLeft(const Matrix<T> &other, unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-    int patchRadX, int patchRadY, T knownSSD) {
+                    int patchRadX, int patchRadY, T knownSSD) {
     assert(i1 >= patchRadY && i2 >= patchRadY &&
       i1 + patchRadY < Height && i2 + patchRadY < other.getHeight());
     assert(j1 >= patchRadX && j2 >= patchRadX &&
@@ -182,7 +188,7 @@ public:
 
   // Returns known SSD shifted 1 pixel up.
   T SSD_ShiftedUp(const Matrix<T> &other, unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-    int patchRadX, int patchRadY, T knownSSD) {
+                  int patchRadX, int patchRadY, T knownSSD) {
     assert(i1 > patchRadY && i2 > patchRadY &&
       i1 + patchRadY < Height && i2 + patchRadY < other.getHeight());
     assert(j1 >= patchRadX && j2 >= patchRadX &&
@@ -201,7 +207,7 @@ public:
 
   // Returns known SSD shifted 1 pixel down.
   T SSD_ShiftedDown(const Matrix<T> &other, unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-    int patchRadX, int patchRadY, T knownSSD) {
+                    int patchRadX, int patchRadY, T knownSSD) {
     assert(i1 >= patchRadY && i2 >= patchRadY &&
       i1 + patchRadY + 1 < Height && i2 + patchRadY + 1 < other.getHeight());
     assert(j1 >= patchRadX && j2 >= patchRadX &&
@@ -218,7 +224,7 @@ public:
     return result;
   }
 
-  friend std::istream &operator>>(std::istream &is, Matrix<T> &m) {
+  friend std::istream &operator >> (std::istream &is, Matrix<T> &m) {
     std::ios_base::sync_with_stdio(false);
     int h, w;
     is >> h >> w;
@@ -249,24 +255,21 @@ public:
   }
 
   void AllocateAndFill(int h, int w, T value) {
-    Destroy();
-    Height = h;
-    Width = w;
-
-    data = new (std::nothrow) T*[Height];
+    ReallocateWithNewSize(h, w);
     if (!data)
       return;
+
     for (int i = 0; i < Height; ++i) {
-      data[i] = new (std::nothrow) T[Width];
+      assert(data[i] && "Row data in NULL!");
       for (int j = 0; j < Width; ++j)
         data[i][j] = value;
     }
   }
 
   void AllocateRandomized(int h, int w, int windowSize, bool vertical) {
-    Destroy();
-    Height = h;
-    Width = w;
+    ReallocateWithNewSize(h, w);
+    if (!data)
+      return;
 
     time_point<system_clock, microseconds> seed = time_point_cast<microseconds>(system_clock::now());
     srand(seed.time_since_epoch().count());
@@ -299,45 +302,42 @@ public:
 
 private:
   void AllocateAndFill(const Matrix<T> &other) {
-    Destroy();
-    Height = other.getHeight();
-    Width = other.getWidth();
-
-    data = new (std::nothrow) T*[Height];
+    ReallocateWithNewSize(other.getHeight(), other.getWidth());
     if (!data)
       return;
+
     for (int i = 0; i < Height; ++i) {
-      data[i] = new (std::nothrow) T[Width];
+      assert(data[i] && "Row data in NULL!");
       for (int j = 0; j < Width; ++j)
         data[i][j] = other[i][j];
     }
   }
 
   void AllocateRandomizedVertical(int windowSize) {
+    assert(data && "Data in NULL!");
     int windowWidth = 2 * windowSize + 1;
-    data = new (std::nothrow) T*[Height];
-    if (!data)
-      return;
+
     for (int i = 0; i < Height; ++i) {
-      data[i] = new (std::nothrow) T[Width];
-      for (int j = 0; j < Width; ++j) {
-        T value = i + rand() % windowWidth - windowSize;
-        if (value < 0)
-          value = 0;
-        if (value >= Height)
-          value = Height - 1;
+      assert(data[i] && "Row data in NULL!");
+
+      T value = i + rand() % windowWidth - windowSize;
+      if (value < 0)
+        value = 0;
+      if (value >= Height)
+        value = Height - 1;
+
+      for (int j = 0; j < Width; ++j)
         data[i][j] = value - i;
-      }
     }
   }
 
   void AllocateRandomizedHorizontal(int windowSize) {
+    assert(data && "Data in NULL!");
     int windowWidth = 2 * windowSize + 1;
-    data = new (std::nothrow) T*[Height];
-    if (!data)
-      return;
+
     for (int i = 0; i < Height; ++i) {
-      data[i] = new (std::nothrow) T[Width];
+      assert(data[i] && "Row data in NULL!");
+
       for (int j = 0; j < Width; ++j) {
         T value = j + rand() % windowWidth - windowSize;
         if (value < 0)
@@ -358,6 +358,24 @@ private:
     }
     data = nullptr;
     Height = Width = 0;
+  }
+
+  // Destroy the Matrix and allocate data with new size.
+  // Data will be uninitialized after this operation.
+  void ReallocateWithNewSize(int h, int w) {
+    Destroy();
+    // Don't create Matrix with zero-size.
+    if (!h || !w)
+      return;
+
+    Height = h;
+    Width = w;
+
+    data = new (std::nothrow) T*[Height];
+    if (!data)
+      return;
+    for (int i = 0; i < Height; ++i)
+      data[i] = new (std::nothrow) T[Width];
   }
 
   int Height;
