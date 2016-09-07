@@ -230,8 +230,11 @@ public:
     is >> h >> w;
     m.AllocateAndFill(h, w, 0);
     for (int i = 0; i < h; ++i)
-      for (int j = 0; j < w; ++j)
+      for (int j = 0; j < w; ++j) {
+        if (!is.good())
+          break;
         is >> m[i][j];
+      }
     return is;
   }
 

@@ -185,6 +185,23 @@ TEST(MatrixTests, TestReadInt) {
   ifs.close();
 }
 
+TEST(MatrixTests, TestReadSmallerFile) {
+  Matrix<int> intMat;
+  std::ifstream ifs("test_data/matrix/3x4_real_2x3_ones_int.txt");
+  ifs >> intMat;
+
+  ASSERT_EQ(3, intMat.getHeight());
+  ASSERT_EQ(4, intMat.getWidth());
+  // First 6 elements must be 1-s.
+  // The rest must be 0-s.
+  for (int linearIdx = 0; linearIdx < 12; ++linearIdx) {
+    int i = linearIdx / intMat.getWidth();
+    int j = linearIdx % intMat.getWidth();
+    int expectedVal = linearIdx < 6 ? 1 : 0;
+    ASSERT_EQ(expectedVal, intMat[i][j]);
+  }
+}
+
 TEST(MatrixTests, TestReadAndSumFloat) {
   Matrix<double> ones;
   Matrix<double> twos;
