@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <chrono>
 
+#include "lodepng/lodepng.h"
+
 using namespace std::chrono;
 
 template <class T>
@@ -50,6 +52,58 @@ public:
     assert((!data || (Height > 0 && Width > 0)) &&
            "Zero-matrix size with non-null data!");
     return data == nullptr;
+  }
+
+  // Read.
+
+  // Reads the file as whitespace-separated plain text matrix.
+  // Extension of the file name is NOT considered!
+  //
+  // File format:
+  //   * The first row contains 2 integers: height and width respectively;
+  //   * Next <height> lines contains <width> numbers each, separated by a whitespace.
+  void ReadFromPlainText(const std::string &fileName) {
+    std::ifstream ifs(fileName);
+    if (!ifs.good())
+      return;
+    ifs >> *this;
+    ifs.close();
+  }
+
+  // Reads the file as PNG image.
+  // Extension of the file name is NOT considered!
+  void ReadFromPNG(const std::string &fileName) {
+    // Free previously allocated memory.
+    Destroy();
+
+    std::vector<unsigned char> png;
+    std::vector<unsigned char> image;
+    unsigned width = 0, height = 0;
+
+    if (lodepng::load_file(png, fileName))
+      return;
+    if (lodepng::decode(image, width, height, png))
+      return;
+
+    // Construct new Matrix. Convert RGB to grayscale.
+    AllocateAndFill(height, width, 0);
+    for (unsigned y = 0; y < height; ++y) {
+      for (unsigned x = 0; x < width; ++x) {
+        auto R = image[4 * width * y + 4 * x + 0];
+        auto G = image[4 * width * y + 4 * x + 1];
+        auto B = image[4 * width * y + 4 * x + 2];
+        auto gray = (R * 0.3) + (G * 0.59) + (B * 0.11);
+        data[y][x] = gray;
+      }
+    }
+  }
+
+  // Based on file extension reads the file as plain text, PNG, etc.
+  void ReadFromFile(const std::string &fileName) {
+    if (fileNameHasExtension(fileName, ".png"))
+      ReadFromPNG(fileName);
+    else
+      ReadFromPlainText(fileName);
   }
 
   // Operators.
@@ -416,6 +470,17 @@ private:
       return;
     for (int i = 0; i < Height; ++i)
       data[i] = new (std::nothrow) T[Width];
+  }
+
+  // Returns true if filename /p source has extension /p ext.
+  // Precondition: ext must start with '.'
+  bool fileNameHasExtension(const std::string &source, const std::string &ext) const {
+    assert(ext.length() > 0 && "Extension is empty!");
+    assert(ext[0] == '.' && "Extension must start with '.' !");
+    // source must represent a valid (non-empty) file name. So at least 1 character + ext.
+    if (source.length() < ext.length() + 1)
+      return false;
+    return source.substr(source.length() - ext.length(), ext.length()) == ext;
   }
 
   int Height;
