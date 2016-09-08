@@ -6,6 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 
 #include "lodepng/lodepng.h"
 
