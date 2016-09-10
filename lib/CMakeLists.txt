@@ -7,4 +7,9 @@ add_library(libOPAL STATIC
             ${ImageDatabase_SRCS}
             ${lodepng_SRCS})
 
+if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
+    ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU"))
+  target_compile_options(libOPAL PRIVATE -Wall -Wextra -Werror)
+endif()
+
 target_include_directories(libOPAL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

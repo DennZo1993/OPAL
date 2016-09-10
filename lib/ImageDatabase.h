@@ -90,29 +90,29 @@ public:
     imageHeight = imageWidth = 0;
   }
 
-  const ImageType &getImage(int i) const {
-    assert(i >= 0 && i < images.size() && "Index out of range!");
+  const ImageType &getImage(unsigned i) const {
+    assert(i < images.size() && "Index out of range!");
     return images[i];
   }
 
-  const SegmentationType &getSegmentation(int i) const {
-    assert(i >= 0 && i < segmentations.size() && "Index out of range!");
+  const SegmentationType &getSegmentation(unsigned i) const {
+    assert(i < segmentations.size() && "Index out of range!");
     return segmentations[i];
   }
 
-  int getImageCount() const {
+  unsigned getImageCount() const {
     assert(images.size() == segmentations.size() &&
            "Image and segmentation databases must have the same size!");
     return images.size();
   }
 
-  int getImageHeight() const { return imageHeight; }
-  int getImageWidth() const { return imageWidth; }
+  unsigned getImageHeight() const { return imageHeight; }
+  unsigned getImageWidth() const { return imageWidth; }
 
 private:
   std::vector<ImageType> images;
   std::vector<SegmentationType> segmentations;
-  int imageHeight;
-  int imageWidth;
+  unsigned imageHeight;
+  unsigned imageWidth;
 };
 
