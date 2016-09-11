@@ -34,7 +34,7 @@ public:
   }
 
   // Construct new matrix and read it from file.
-  Matrix(const std::string fileName) : data(nullptr) {
+  Matrix(const std::string &fileName) : data(nullptr) {
     ReadFromFile(fileName);
   }
 
@@ -518,8 +518,8 @@ private:
 
   // Returns true if filename /p source has extension /p ext.
   // Precondition: ext must start with '.'
-  bool fileNameHasExtension(const std::string &source,
-                            const std::string &ext) const {
+  static bool fileNameHasExtension(const std::string &source,
+                                   const std::string &ext) {
     assert(ext.length() > 0 && "Extension is empty!");
     assert(ext[0] == '.' && "Extension must start with '.' !");
     // source must represent a valid (non-empty) file name.
