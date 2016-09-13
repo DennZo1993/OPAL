@@ -1,5 +1,7 @@
 # OPAL
-[![Build Status](https://travis-ci.org/DennZo1993/OPAL.svg?branch=master)](https://travis-ci.org/DennZo1993/OPAL)
+| Build | Coverage |
+|---|---|
+| [![Build Status](https://travis-ci.org/DennZo1993/OPAL.svg?branch=master)](https://travis-ci.org/DennZo1993/OPAL) | [![Coverage Status](https://coveralls.io/repos/github/DennZo1993/OPAL/badge.svg?branch=master)](https://coveralls.io/github/DennZo1993/OPAL?branch=master) |
 
 **University project**
 
@@ -13,4 +15,4 @@ Near Real Time and Accurate Label Fusion. MICCAI 2014, Sep 2014, United States. 
 
 
 **Third-party libraries used**
-- [lodepng](https://github.com/lvandeve/lodepng)
+- [LodePNG](https://github.com/lvandeve/lodepng)
