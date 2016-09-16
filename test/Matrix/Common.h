@@ -1,8 +1,19 @@
+#pragma once
+
 #include "gtest/gtest.h"
 #include "Matrix.h"
 #include <fstream>
 
 constexpr double EPS = 1.0e-5;
+
+int RandomWithLimits(int lowerLimit, int upperLimit);
+
+template<class T>
+void FillRandomizedWithLimits(Matrix<T> &m, int lowerLimit, int upperLimit) {
+  for (unsigned i = 0; i < m.getHeight(); ++i)
+    for (unsigned j = 0; j < m.getWidth(); ++j)
+      m[i][j] = static_cast<T>(RandomWithLimits(lowerLimit, upperLimit));
+}
 
 template<class T>
 ::testing::AssertionResult MatrixHasSize(const Matrix<T> &m,

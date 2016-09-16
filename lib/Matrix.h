@@ -215,6 +215,8 @@ public:
 
   friend std::ostream &operator <<(std::ostream &os, const Matrix<T> &m) {
     std::ios_base::sync_with_stdio(false);
+
+    os << m.getHeight() << ' ' << m.getWidth() << '\n';
     for (unsigned i = 0; i < m.getHeight(); ++i) {
       for (unsigned j = 0; j < m.getWidth(); ++j) {
         //os.width(3);
