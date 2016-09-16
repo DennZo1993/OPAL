@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <cmath>      // std::abs
 #include <iostream>
 #include <algorithm>
 #include <chrono>
@@ -393,7 +394,7 @@ public:
            j1 + patchRadX + 1 < Width && j2 + patchRadX + 1 < other.getWidth());
     assert(patchRadX > 0 && patchRadY > 0);
     auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY);
-    assert(fabs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
+    assert(std::abs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
 #endif
 
     T result = knownSSD;
@@ -419,7 +420,7 @@ public:
            j1 + patchRadX < Width && j2 + patchRadX < other.getWidth());
     assert(patchRadX > 0 && patchRadY > 0);
     auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY);
-    assert(fabs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
+    assert(std::abs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
 #endif
 
     T result = knownSSD;
@@ -446,7 +447,7 @@ public:
            j1 + patchRadX < Width && j2 + patchRadX < other.getWidth());
     assert(patchRadX > 0 && patchRadY > 0);
     auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY);
-    assert(fabs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
+    assert(std::abs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
 #endif
 
     T result = knownSSD;
@@ -473,7 +474,7 @@ public:
            j1 + patchRadX < Width && j2 + patchRadX < other.getWidth());
     assert(patchRadX > 0 && patchRadY > 0);
     auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY);
-    assert(fabs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
+    assert(std::abs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
 #endif
 
     T result = knownSSD;

@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
 #include "Matrix.h"
 #include <fstream>
-#include <cmath>    // fabs
 
 constexpr double EPS = 1.0e-5;
 
@@ -30,7 +29,7 @@ template<class T>
                                               const T &value) {
   for (unsigned i = 0; i < m.getHeight(); ++i)
     for (unsigned j = 0; j < m.getWidth(); ++j)
-      if (fabs(m[i][j] - value) > EPS)
+      if (std::abs(m[i][j] - value) > EPS)
         return ::testing::AssertionFailure()
           << "value at (" << i << ", " << j << ") is not " << value;
 
