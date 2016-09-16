@@ -69,7 +69,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0") # debug, no optimisation
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage") # enabling coverage
 
 # Testing project
-file(GLOB TEST_SOURCES *.cpp)
+SET(TEST_SOURCES Main.cpp
+                 Matrix/Constructors.cpp
+                 Matrix/Allocation.cpp
+                 Matrix/Read.cpp
+                 Matrix/Misc.cpp
+                 Matrix/AdditionSubtraction.cpp
+                 Matrix/Relation.cpp
+                 Matrix/Assign.cpp
+                 Matrix/SSD.cpp
+                 ImageDatabaseTests.cpp)
 
 ADD_EXECUTABLE(Tests ${TEST_SOURCES})
 

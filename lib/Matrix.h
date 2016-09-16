@@ -34,7 +34,8 @@ public:
   }
 
   // Construct new matrix and read it from file.
-  Matrix(const std::string &fileName) : data(nullptr) {
+  Matrix(const std::string &fileName)
+    : data(nullptr), Height(0), Width(0) {
     ReadFromFile(fileName);
   }
 
@@ -159,9 +160,6 @@ public:
   // Reads the file as PNG image.
   // Extension of the file name is NOT considered!
   void ReadFromPNG(const std::string &fileName) {
-    // Release previously allocated memory.
-    Destroy();
-
     std::vector<unsigned char> png;
     std::vector<unsigned char> image;
     unsigned width = 0, height = 0;
