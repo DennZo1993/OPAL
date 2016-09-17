@@ -420,7 +420,7 @@ public:
 
   // SSD between whole matrices.
   // Throws std::invalid_argument.
-  T SSD(const Matrix<T> &other) {
+  T SSD(const Matrix<T> &other) const {
     if (Height != other.getHeight() ||
         Width != other.getWidth())
       throw std::invalid_argument("Matrix size mismatch in SSD!");
@@ -440,7 +440,7 @@ public:
   // SSD between patches.
   T SSD(const Matrix<T> &other,
         unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-        int patchRadX, int patchRadY) {
+        int patchRadX, int patchRadY) const {
 #ifdef CHECK_SSD_BOUNDARIES
     // Make sure index won't get out of range.
     if (!(i1 >= patchRadY && i2 >= patchRadY &&
@@ -470,7 +470,7 @@ public:
   // knownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY).
   T SSD_ShiftedRight(const Matrix<T> &other,
                      unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                     int patchRadX, int patchRadY, T knownSSD) {
+                     int patchRadX, int patchRadY, T knownSSD) const {
 #ifdef CHECK_SSD_BOUNDARIES
     if (!(i1 >= patchRadY && i2 >= patchRadY &&
           i1 + patchRadY < Height && i2 + patchRadY < other.getHeight()))
@@ -503,7 +503,7 @@ public:
   // Returns known SSD shifted 1 pixel left.
   T SSD_ShiftedLeft(const Matrix<T> &other,
                     unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                    int patchRadX, int patchRadY, T knownSSD) {
+                    int patchRadX, int patchRadY, T knownSSD) const {
 #ifdef CHECK_SSD_BOUNDARIES
     if (!(i1 >= patchRadY && i2 >= patchRadY &&
           i1 + patchRadY < Height && i2 + patchRadY < other.getHeight()))
@@ -537,7 +537,7 @@ public:
   // knownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY).
   T SSD_ShiftedUp(const Matrix<T> &other,
                   unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                  int patchRadX, int patchRadY, T knownSSD) {
+                  int patchRadX, int patchRadY, T knownSSD) const {
 #ifdef CHECK_SSD_BOUNDARIES
     if (!(i1 >= patchRadY + 1 && i2 >= patchRadY + 1 &&
           i1 + patchRadY < Height && i2 + patchRadY < other.getHeight()))
@@ -571,7 +571,7 @@ public:
   // knownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY).
   T SSD_ShiftedDown(const Matrix<T> &other,
                     unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                    int patchRadX, int patchRadY, T knownSSD) {
+                    int patchRadX, int patchRadY, T knownSSD) const {
 #ifdef CHECK_SSD_BOUNDARIES
     if (!(i1 >= patchRadY && i2 >= patchRadY &&
           i1 + patchRadY + 1 < Height && i2 + patchRadY + 1 < other.getHeight()))
@@ -604,7 +604,7 @@ public:
 
   void PRINT_SSD(const Matrix<T> &other,
                  unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                 int patchRadX, int patchRadY = 0) {
+                 int patchRadX, int patchRadY = 0) const {
     if (!patchRadY)
       patchRadY = patchRadX;
     assert(i1 >= patchRadY && i2 >= patchRadY &&
