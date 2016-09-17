@@ -108,6 +108,11 @@ public:
 
   unsigned getImageHeight() const { return imageHeight; }
   unsigned getImageWidth() const { return imageWidth; }
+  inline bool isEmpty() const {
+    assert(images.size() == segmentations.size() &&
+           "Image and segmentation databases must have the same size!");
+    return images.size() == 0;
+  }
 
 private:
   std::vector<ImageType> images;

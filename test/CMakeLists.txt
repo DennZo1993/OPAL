@@ -80,7 +80,11 @@ SET(TEST_SOURCES Main.cpp
                  Matrix/Relation.cpp
                  Matrix/Assign.cpp
                  Matrix/SSD.cpp
-                 ImageDatabaseTests.cpp)
+
+                 ImageDatabaseTests.cpp
+
+                 ../lib/OPAL.cpp
+                 OPAL/Constructor.cpp)
 
 ADD_EXECUTABLE(Tests ${TEST_SOURCES})
 
