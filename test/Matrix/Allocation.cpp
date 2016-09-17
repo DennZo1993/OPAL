@@ -30,18 +30,18 @@ TEST_F(AllocationTest, AllocationZero3) {
 }
 
 TEST_F(AllocationTest, AllocationNegative1) {
-  m1.AllocateAndFill(-10, 10, 3);
-  ASSERT_TRUE(MatrixIsEmpty(m1));
+  ASSERT_THROW(m1.AllocateAndFill(-10, 10, 3),
+               std::invalid_argument);
 }
 
 TEST_F(AllocationTest, AllocationNegative2) {
-  m1.AllocateAndFill(10, -29, 4);
-  ASSERT_TRUE(MatrixIsEmpty(m1));
+  ASSERT_THROW(m1.AllocateAndFill(10, -29, 4),
+               std::invalid_argument);
 }
 
 TEST_F(AllocationTest, AllocationNegative3) {
-  m1.AllocateAndFill(-1, -1, 0);
-  ASSERT_TRUE(MatrixIsEmpty(m1));
+  ASSERT_THROW(m1.AllocateAndFill(-1, -1, 0),
+               std::invalid_argument);
 }
 
 class ReallocationTest : public ::testing::Test {
@@ -65,8 +65,8 @@ TEST_F(ReallocationTest, ReallocationToNegative) {
   ASSERT_TRUE(MatrixHasSize(m1, 5, 10));
   ASSERT_TRUE(MatrixIsFilledWith(m1, 2));
 
-  m1.Allocate(-1, -1);
-  ASSERT_TRUE(MatrixIsEmpty(m1));
+  ASSERT_THROW(m1.Allocate(-1, -1),
+               std::invalid_argument);
 }
 
 TEST_F(ReallocationTest, ReallocationGrow) {

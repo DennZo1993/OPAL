@@ -69,7 +69,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0") # debug, no optimisation
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage") # enabling coverage
 
 # Testing project
-SET(TEST_SOURCES Main.cpp
+SET(TEST_SOURCES main.cpp
                  Matrix/Common.cpp
                  Matrix/Constructors.cpp
                  Matrix/Allocation.cpp

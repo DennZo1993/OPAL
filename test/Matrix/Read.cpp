@@ -37,20 +37,25 @@ TEST_F(MatrixReadToNonEmpty, ReadExistingEmptyText1) {
 
 TEST_F(MatrixReadToNonEmpty, ReadExistingEmptyText2) {
   // File with "5"
-  m1.ReadFromFile("test_data/matrix/empty_1.txt");
-  ASSERT_TRUE(MatrixIsEmpty(m1));
+  ASSERT_THROW(m1.ReadFromFile("test_data/matrix/empty_1.txt"),
+               std::ifstream::failure);
+  ASSERT_TRUE(MatrixHasSize(m1, 10, 20));
+  ASSERT_TRUE(MatrixIsFilledWith(m1, 3.5));
 }
 
 TEST_F(MatrixReadToNonEmpty, ReadExistingEmptyText3) {
   // Empty file
-  m1.ReadFromFile("test_data/matrix/empty_2.txt");
-  ASSERT_TRUE(MatrixIsEmpty(m1));
+  ASSERT_THROW(m1.ReadFromFile("test_data/matrix/empty_2.txt"),
+               std::ifstream::failure);
+  ASSERT_TRUE(MatrixHasSize(m1, 10, 20));
+  ASSERT_TRUE(MatrixIsFilledWith(m1, 3.5));
 }
 
 TEST_F(MatrixReadToNonEmpty, ReadNonExisting) {
   // Non-existing file
-  // Nothing shoul happen to the matrix.
-  m1.ReadFromFile("test_data/matrix/qwasfkj.txt");
+  // Nothing should happen to the matrix.
+  ASSERT_THROW(m1.ReadFromFile("test_data/matrix/qwasfkj.txt"),
+               std::ifstream::failure);
   ASSERT_TRUE(MatrixHasSize(m1, 10, 20));
   ASSERT_TRUE(MatrixIsFilledWith(m1, 3.5));
 }
@@ -73,13 +78,15 @@ TEST_F(MatrixReadToNonEmpty, ReadLargerText) {
 }
 
 TEST_F(MatrixReadToNonEmpty, ReadEmptyPNG) {
-  m1.ReadFromPNG("test_data/pictures/empty.PNG");
+  ASSERT_THROW(m1.ReadFromPNG("test_data/pictures/empty.PNG"),
+               std::runtime_error);
   ASSERT_TRUE(MatrixHasSize(m1, 10, 20));
   ASSERT_TRUE(MatrixIsFilledWith(m1, 3.5));
 }
 
 TEST_F(MatrixReadToNonEmpty, ReadNonExistingPNG) {
-  m1.ReadFromPNG("test_data/pictures/lkjaslkh.PNG");
+  ASSERT_THROW(m1.ReadFromPNG("test_data/pictures/lkjaslkh.PNG"),
+               std::runtime_error);
   ASSERT_TRUE(MatrixHasSize(m1, 10, 20));
   ASSERT_TRUE(MatrixIsFilledWith(m1, 3.5));
 }

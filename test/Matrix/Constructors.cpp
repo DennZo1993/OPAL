@@ -72,16 +72,16 @@ TEST(MatrixTest, Constructors9) {
 }
 
 TEST(MatrixTest, ConstructorsNegative1) {
-  Matrix<int> m10(-1, 10, 5);
-  ASSERT_TRUE(MatrixIsEmpty(m10));
+  ASSERT_THROW(Matrix<int> m10(-1, 10, 5),
+               std::invalid_argument);
 }
 
 TEST(MatrixTest, ConstructorsNegative2) {
-  Matrix<int> m10(5, -1232, 5);
-  ASSERT_TRUE(MatrixIsEmpty(m10));
+  ASSERT_THROW(Matrix<int> m10(5, -1232, 5),
+               std::invalid_argument);
 }
 
 TEST(MatrixTest, ConstructorsNegative3) {
-  Matrix<int> m10(-1, -10, 5);
-  ASSERT_TRUE(MatrixIsEmpty(m10));
+  ASSERT_THROW(Matrix<int> m10(-1, -10, 5),
+               std::invalid_argument);
 }
