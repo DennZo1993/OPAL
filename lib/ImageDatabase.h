@@ -2,6 +2,7 @@
 
 #include "Matrix.h"
 
+#include <stdexcept>
 #include <cassert>
 #include <vector>
 #include <string>
@@ -17,6 +18,8 @@ public:
 
   ImageDatabase() : imageHeight(0), imageWidth(0) {}
 
+
+  // Throws std::runtime_error.
   void Add(const std::string &imageFileName, const std::string &segFileName) {
     Matrix<ImagePixelType> imgMat;
     Matrix<SegmentationPixelType> segMat;
@@ -24,14 +27,13 @@ public:
     segMat.ReadFromFile(segFileName);
 
     // Don't add empty images.
-    // FIXME: Throw an exception here!
     if (imgMat.isEmpty() || segMat.isEmpty())
-      return;
+      throw std::runtime_error("Loaded empty image or segmentation!");
+
     // Don't add images with different dimensions.
-    // FIXME: Throw an exception here!
     if (imgMat.getHeight() != segMat.getHeight() ||
         imgMat.getWidth() != segMat.getWidth())
-      return;
+      throw std::runtime_error("Image/segmentation size mismatch!");
 
     // Check size of images.
     if (images.size() == 0) {
@@ -41,21 +43,22 @@ public:
     } else {
       assert(imageHeight != 0 && imageWidth != 0 &&
              "Only one of image dimensions is 0!");
+
       // Don't add images which dimensions don't match the base.
-      // FIXME: Throw an exception here!
       if (imgMat.getHeight() != imageHeight || imgMat.getWidth() != imageWidth)
-        return;
+        throw std::runtime_error(
+          "Size of new image/segmentation doesn't suit the database!");
     }
 
     // Here we must have 2 non-empty images with the same dimensions that fit the
     // dimensions of database.
-    assert(!imgMat.isEmpty() && !segMat.isEmpty() && 
+    assert(!imgMat.isEmpty() && !segMat.isEmpty() &&
            "At least one of the images is empty!");
     assert(imgMat.getHeight() == segMat.getHeight() &&
            imgMat.getWidth() == segMat.getWidth() &&
            "Image and segmentation sizes must be the same!");
-    assert(imgMat.getHeight() == imageHeight && imgMat.getWidth() == imageWidth &&
-           "Image size doesn't match the size of other images in database!");
+    assert(imgMat.getHeight() == imageHeight && imgMat.getWidth() == imageWidth
+           && "Image size doesn't match the size of other images in database!");
 
     images.push_back(imgMat);
     segmentations.push_back(segMat);
@@ -64,11 +67,10 @@ public:
            "Image and segmentation databases must have the same size!");
   }
 
+
+  // Throws std iostream excetions, std::runtime_error.
   void AppendFilesFromList(const std::string &fileName) {
     std::ifstream ifs(fileName);
-    // FIXME: exception here!
-    if (ifs.fail())
-      return;
 
     std::string imageFileName, segFileName;
     while (ifs >> imageFileName) {
@@ -79,10 +81,12 @@ public:
     ifs.close();
   }
 
+
   void ReadFilesFromList(const std::string &fileName) {
     Clear();
     AppendFilesFromList(fileName);
   }
+
 
   void Clear() {
     images.clear();
@@ -90,21 +94,28 @@ public:
     imageHeight = imageWidth = 0;
   }
 
+  // Throws std::out_of_range.
   const ImageType &getImage(unsigned i) const {
-    assert(i < images.size() && "Index out of range!");
+    if (i >= images.size())
+     throw std::out_of_range("Index out of range!");
     return images[i];
   }
 
+
+  // Throws std::out_of_range.
   const SegmentationType &getSegmentation(unsigned i) const {
-    assert(i < segmentations.size() && "Index out of range!");
+    if(i >= segmentations.size())
+      throw std::out_of_range("Index out of range!");
     return segmentations[i];
   }
+
 
   unsigned getImageCount() const {
     assert(images.size() == segmentations.size() &&
            "Image and segmentation databases must have the same size!");
     return images.size();
   }
+
 
   unsigned getImageHeight() const { return imageHeight; }
   unsigned getImageWidth() const { return imageWidth; }
