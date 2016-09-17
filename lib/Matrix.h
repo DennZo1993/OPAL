@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits> // std::enable_if
+
 #include <cassert>
 #include <cmath>      // std::abs
 #include <iostream>
@@ -9,8 +11,14 @@
 
 #include "lodepng/lodepng.h"
 
+// Class representing two-dimentional array of arithmetic types
+// (i. e. integral or floating-point). Other types are forbidden.
+template<class T, class Enable = void>
+class Matrix;
+
 template <class T>
-class Matrix {
+class Matrix<T, typename std::enable_if<std::is_arithmetic<T>::value>::type>
+{
 // ==========
 // Constructors and destructor.
 // ==========

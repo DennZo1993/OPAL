@@ -30,12 +30,24 @@ TEST(RelationTest, TestEqualNonEmpty2) {
   ASSERT_EQ(m1, m2.castTo<int>());
 }
 
-TEST(RelationTest, TestEqualNonEmpty3) {
-  Matrix<float> m1(1, 5, 4.0f);
-  Matrix<float> m2(1, 5, 2.0f);
+TEST(RelationTest, TestEqualFloat) {
+  // Equal for float.
+
+  Matrix<float> m1(1, 5, 4.00000021);
+  Matrix<float> m2(1, 5, 2.000000104);
 
   ASSERT_EQ(m1, m2 + m2);
   ASSERT_EQ(m1 - m2, m2);
+}
+
+TEST(RelationTest, TestiNotEqualDouble) {
+  // NOT equal for double.
+
+  Matrix<double> m1(1, 5, 4.00000021);
+  Matrix<double> m2(1, 5, 2.000000104);
+
+  ASSERT_NE(m1, m2 + m2);
+  ASSERT_NE(m1 - m2, m2);
 }
 
 TEST(RelationTest, TestNotEqualEmptyNonEmpty) {

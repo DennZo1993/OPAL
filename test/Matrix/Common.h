@@ -2,7 +2,9 @@
 
 #include "gtest/gtest.h"
 #include "Matrix.h"
+
 #include <fstream>
+#include <type_traits> // std::enable_if
 
 constexpr double EPS = 1.0e-5;
 
@@ -35,14 +37,33 @@ template<class T>
   return MatrixHasSize(m, 0, 0) << ", isEmpty() returned true";
 }
 
+
+// For integral types.
 template<class T>
-::testing::AssertionResult MatrixIsFilledWith(const Matrix<T> &m,
-                                              const T &value) {
+::testing::AssertionResult MatrixIsFilledWith(
+  const Matrix<T> &m,
+  const typename std::enable_if<std::is_integral<T>::value, T>::type &v)
+{
   for (unsigned i = 0; i < m.getHeight(); ++i)
     for (unsigned j = 0; j < m.getWidth(); ++j)
-      if (std::abs(m[i][j] - value) > EPS)
+      if (m[i][j] != v)
         return ::testing::AssertionFailure()
-          << "value at (" << i << ", " << j << ") is not " << value;
+          << "value at (" << i << ", " << j << ") is not " << v;
 
-  return ::testing::AssertionSuccess() << "matrix is filled with " << value;
+  return ::testing::AssertionSuccess() << "matrix is filled with " << v;
+}
+
+
+template<class T>
+::testing::AssertionResult MatrixIsFilledWith(
+  const Matrix<T> &m,
+  const typename std::enable_if<std::is_floating_point<T>::value, T>::type &v)
+{
+  for (unsigned i = 0; i < m.getHeight(); ++i)
+    for (unsigned j = 0; j < m.getWidth(); ++j)
+      if (std::abs(m[i][j] - v) > EPS)
+        return ::testing::AssertionFailure()
+          << "value at (" << i << ", " << j << ") is not " << v;
+
+  return ::testing::AssertionSuccess() << "matrix is filled with " << v;
 }
