@@ -83,7 +83,6 @@ SET(TEST_SOURCES Main.cpp
 
                  ImageDatabaseTests.cpp
 
-                 ../lib/OPAL.cpp
                  OPAL/Constructor.cpp)
 
 ADD_EXECUTABLE(Tests ${TEST_SOURCES})

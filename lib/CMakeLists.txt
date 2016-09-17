@@ -1,11 +1,7 @@
-set (Matrix_SRCS Matrix.h Matrix.cpp)
-set (ImageDatabase_SRCS ImageDatabase.h ImageDatabase.cpp)
-set (lodepng_SRCS lodepng/lodepng.h lodepng/lodepng.cpp)
+set (SOURCES lodepng/lodepng.cpp
+             OPAL.cpp)
 
-add_library(libOPAL STATIC
-            ${Matrix_SRCS}
-            ${ImageDatabase_SRCS}
-            ${lodepng_SRCS})
+add_library(libOPAL STATIC ${SOURCES})
 
 if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU"))
