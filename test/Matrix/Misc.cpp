@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "../Common.h"
 
 TEST(MatrixMiscTest, TestCast) {
   // Test casting non-empty matrix. Floor.

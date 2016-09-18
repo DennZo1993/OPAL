@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "../Common.h"
 
 Matrix<double> GetMatrix() {
   return Matrix<double>(5, 10, 7.0);

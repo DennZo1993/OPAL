@@ -1,4 +1,4 @@
-#include "Matrix/Common.h"
+#include "Common.h"
 #include "ImageDatabase.h"
 
 TEST(ImageDatabaseTests, TestLoadMatrixImage) {

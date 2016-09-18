@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "../Common.h"
 
 TEST(MatrixWrite, WriteEmpty) {
   std::string fileName = "test1.txt";

@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "../Common.h"
 
 class AllocationTest : public ::testing::Test {
 protected:

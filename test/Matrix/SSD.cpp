@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "../Common.h"
 
 class SSDShiftTest : public ::testing::Test {
 protected:

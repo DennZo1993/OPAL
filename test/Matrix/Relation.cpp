@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "../Common.h"
 
 TEST(RelationTest, TestEqualEmpty) {
   Matrix<int> m1;
