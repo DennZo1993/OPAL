@@ -2,7 +2,10 @@
 
 #include "Matrix.h"
 #include "ImageDatabase.h"
-#include <stdexcept>
+#include "OPALSettings.h"
+
+#include <chrono>
+#include <random>
 
 // Main class in the project. Implements core logic.
 class OPAL {
@@ -13,15 +16,30 @@ public:
   using DatabaseType = ImageDatabase<ImagePixelType, SegmentationPixelType>;
 
   // OPAL works with several images stored in a database.
-  OPAL(const DatabaseType &database);
+  OPAL(const OPALSettings &settings, const DatabaseType &database);
+
+  //  I. Constraint initialization.
+  //  For each of the image located at (x, y) a random patch correspondence
+  //  located at {(x',y'), t'} where t' is the index of template in the library.
+  void ConstrainedInitialization();
+
+
+  const Matrix<int>     &getFieldX() const { return FieldX; }
+  const Matrix<int>     &getFieldY() const { return FieldY; }
+  const Matrix<size_t>  &getFieldT() const { return FieldT; }
+  const Matrix<double>  &getSSDMap() const { return SSDMap; }
+
 
 private:
+  // Settings.
+  const OPALSettings &Sets;
+
   // Database of images. Image to be segmented at index 0.
   const DatabaseType &Database;
 
   // Output displacement fields.
-  Matrix<int>     FieldX; // x-coordinate
-  Matrix<int>     FieldY; // y-coordinate
+  Matrix<int>     FieldX; // x-coordinate *offset*
+  Matrix<int>     FieldY; // y-coordinate *offset*
   Matrix<size_t>  FieldT; // image index (in database)
   Matrix<double>  SSDMap; // SSD between patches with centers at (i,j).
 
@@ -29,4 +47,15 @@ private:
   // Database.getImageHeight(), Database.getImageWidth().
   size_t ImageHeight;
   size_t ImageWidth;
+
+  // Input image to be segmented. Always Database[0].
+  Matrix<ImagePixelType> InputImage;
+
+  using RandomGeneratorType = std::mt19937;
+  RandomGeneratorType randGen;
+
+private:
+
+  // Recalculate the whole SSD map.
+  void UpdateSSDMap();
 };
