@@ -87,7 +87,7 @@ TEST(ImageDatabaseTests, TestLoadMatrixImagesFromList) {
 
   ASSERT_EQ(2, db.getImageCount());
 
-  for (int imageIndex = 0; imageIndex < db.getImageCount(); ++imageIndex) {
+  for (size_t imageIndex = 0; imageIndex < db.getImageCount(); ++imageIndex) {
     const Matrix<double> &img = db.getImage(imageIndex);
     const Matrix<int> &seg = db.getSegmentation(imageIndex);
     ASSERT_TRUE(MatrixHasSize(img, 3, 4));

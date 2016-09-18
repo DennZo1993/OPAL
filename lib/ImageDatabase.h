@@ -95,7 +95,7 @@ public:
   }
 
   // Throws std::out_of_range.
-  const ImageType &getImage(unsigned i) const {
+  const ImageType &getImage(size_t i) const {
     if (i >= images.size())
      throw std::out_of_range("Index out of range!");
     return images[i];
@@ -103,22 +103,22 @@ public:
 
 
   // Throws std::out_of_range.
-  const SegmentationType &getSegmentation(unsigned i) const {
+  const SegmentationType &getSegmentation(size_t i) const {
     if(i >= segmentations.size())
       throw std::out_of_range("Index out of range!");
     return segmentations[i];
   }
 
 
-  unsigned getImageCount() const {
+  size_t getImageCount() const {
     assert(images.size() == segmentations.size() &&
            "Image and segmentation databases must have the same size!");
     return images.size();
   }
 
 
-  unsigned getImageHeight() const { return imageHeight; }
-  unsigned getImageWidth() const { return imageWidth; }
+  size_t getImageHeight() const { return imageHeight; }
+  size_t getImageWidth() const { return imageWidth; }
   inline bool isEmpty() const {
     assert(images.size() == segmentations.size() &&
            "Image and segmentation databases must have the same size!");
@@ -128,7 +128,7 @@ public:
 private:
   std::vector<ImageType> images;
   std::vector<SegmentationType> segmentations;
-  unsigned imageHeight;
-  unsigned imageWidth;
+  size_t imageHeight;
+  size_t imageWidth;
 };
 

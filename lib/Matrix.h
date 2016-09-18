@@ -537,7 +537,7 @@ public:
 #endif // CHECK_SSD_BOUNDARIES
 
     T result = knownSSD;
-    for (int dx = 0; dx < patchSideX; ++dx) {
+    for (size_t dx = 0; dx < patchSideX; ++dx) {
       // Positive.
       T diff1 = data[i1 - 1][j1 + dx] - other[i2 - 1][j2 + dx];
       // Negative.
@@ -566,7 +566,7 @@ public:
 #endif // CHECK_SSD_BOUNDARIES
 
     T result = knownSSD;
-    for (int dx = 0; dx < patchSideX; ++dx) {
+    for (size_t dx = 0; dx < patchSideX; ++dx) {
       // Positive.
       T diff1 = data[i1 + patchSideY][j1 + dx] - other[i2 + patchSideY][j2 + dx];
       // Negative.
