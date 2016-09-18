@@ -96,7 +96,7 @@ public:
 
     try {
       data = new T*[Height];
-      for (unsigned i = 0; i < Height; ++i)
+      for (size_t i = 0; i < Height; ++i)
         data[i] = new T[Width];
     } catch (...) {
       Destroy();
@@ -116,9 +116,9 @@ public:
     }
 
     assert(data && "Data is NULL!");
-    for (unsigned i = 0; i < Height; ++i) {
-      assert(data[i] && "Row data in NULL!");
-      for (unsigned j = 0; j < Width; ++j)
+    for (size_t i = 0; i < Height; ++i) {
+      assert(data[i] && "Row data is NULL!");
+      for (size_t j = 0; j < Width; ++j)
         data[i][j] = other[i][j];
     }
   }
@@ -128,7 +128,7 @@ private:
   // Free allocated memory. Set dimensions to 0, data to nullptr.
   void Destroy() {
     if (data) {
-      for (unsigned i = 0; i < Height; ++i)
+      for (size_t i = 0; i < Height; ++i)
         if (data[i])
           delete[] data[i];
       delete[] data;
@@ -151,10 +151,10 @@ public:
     assert(((data && Height && Width) || (!data && !Height && !Width)) &&
            "Null data with non-zero dimensions or vice versa!");
 
-    for (unsigned i = 0; i < Height; ++i) {
+    for (size_t i = 0; i < Height; ++i) {
       assert(data[i] && "Row data in NULL!");
 
-      for (unsigned j = 0; j < Width; ++j)
+      for (size_t j = 0; j < Width; ++j)
         data[i][j] = value;
     }
   }
@@ -215,8 +215,8 @@ public:
     // Construct new Matrix. Convert RGB to grayscale.
     Allocate(height, width);
 
-    for (unsigned y = 0; y < height; ++y) {
-      for (unsigned x = 0; x < width; ++x) {
+    for (size_t y = 0; y < height; ++y) {
+      for (size_t x = 0; x < width; ++x) {
         auto R = image[4 * width * y + 4 * x + 0];
         auto G = image[4 * width * y + 4 * x + 1];
         auto B = image[4 * width * y + 4 * x + 2];
@@ -251,8 +251,8 @@ public:
 
     m.Allocate(h, w);
 
-    for (unsigned i = 0; i < m.getHeight(); ++i)
-      for (unsigned j = 0; j < m.getWidth(); ++j) {
+    for (size_t i = 0; i < m.getHeight(); ++i)
+      for (size_t j = 0; j < m.getWidth(); ++j) {
         // If stream containes less data than declared - stop reading.
         if (!is.good())
           break;
@@ -269,8 +269,8 @@ public:
     os.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
     os << m.getHeight() << ' ' << m.getWidth() << '\n';
-    for (unsigned i = 0; i < m.getHeight(); ++i) {
-      for (unsigned j = 0; j < m.getWidth(); ++j) {
+    for (size_t i = 0; i < m.getHeight(); ++i) {
+      for (size_t j = 0; j < m.getWidth(); ++j) {
         //os.width(3);
         os << m[i][j] << ' ';
       }
@@ -286,7 +286,7 @@ public:
 public:
 
   // Throws std::out_of_range.
-  T *&operator[](unsigned i) {
+  T *&operator[](size_t i) {
     assert(data && "Subscript operation on null data!");
     if (i >= Height)
       throw std::out_of_range("Index " + std::to_string(i) +
@@ -295,7 +295,7 @@ public:
   }
 
 
-  const T *operator[](unsigned i) const {
+  const T *operator[](size_t i) const {
     assert(data && "Subscript operation on null data!");
     if (i >= Height)
       throw std::out_of_range("Index " + std::to_string(i) +
@@ -303,8 +303,8 @@ public:
     return data[i];
   }
 
-  inline unsigned getHeight() const { return Height; }
-  inline unsigned getWidth() const { return Width; }
+  inline size_t getHeight() const { return Height; }
+  inline size_t getWidth() const { return Width; }
 
   inline bool isEmpty() const {
     assert(((!data && !Height && !Width) || (data && Height && Width)) &&
@@ -337,8 +337,8 @@ public:
   Matrix<U> castTo() const {
     Matrix<U> result(Height, Width, 0);
 
-    for (unsigned i = 0; i < Height; ++i)
-      for (unsigned j = 0; j < Width; ++j)
+    for (size_t i = 0; i < Height; ++i)
+      for (size_t j = 0; j < Width; ++j)
         result[i][j] = static_cast<U>(data[i][j]);
 
     return result;
@@ -354,8 +354,8 @@ public:
     if (Height != other.getHeight() || Width != other.getWidth())
       return false;
 
-    for (unsigned i = 0; i < Height; ++i)
-      for (unsigned j = 0; j < Width; ++j)
+    for (size_t i = 0; i < Height; ++i)
+      for (size_t j = 0; j < Width; ++j)
         if (data[i][j] != other[i][j])
           return false;
     return true;
@@ -380,8 +380,8 @@ public:
     if (isEmpty())
       return *this;
 
-    for (unsigned i = 0; i < Height; ++i)
-      for (unsigned j = 0; j < Width; ++j)
+    for (size_t i = 0; i < Height; ++i)
+      for (size_t j = 0; j < Width; ++j)
         data[i][j] += other[i][j];
     return *this;
   }
@@ -397,8 +397,8 @@ public:
     if (isEmpty())
       return *this;
 
-    for (unsigned i = 0; i < Height; ++i)
-      for (unsigned j = 0; j < Width; ++j)
+    for (size_t i = 0; i < Height; ++i)
+      for (size_t j = 0; j < Width; ++j)
         data[i][j] -= other[i][j];
     return *this;
   }
@@ -426,8 +426,8 @@ public:
       throw std::invalid_argument("Matrix size mismatch in SSD!");
 
     T result = 0;
-    for (unsigned int i = 0; i < Height; ++i)
-      for (unsigned int j = 0; j < Width; ++j) {
+    for (size_t i = 0; i < Height; ++i)
+      for (size_t j = 0; j < Width; ++j) {
         T diff = data[i][j] - other[i][j];
         result += diff * diff;
       }
@@ -439,25 +439,20 @@ public:
 
   // SSD between patches.
   T SSD(const Matrix<T> &other,
-        unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-        int patchRadX, int patchRadY) const {
+        size_t i1, size_t j1, size_t i2, size_t j2,
+        size_t patchSideX, size_t patchSideY) const {
 #ifdef CHECK_SSD_BOUNDARIES
     // Make sure index won't get out of range.
-    if (!(i1 >= patchRadY && i2 >= patchRadY &&
-          i1 + patchRadY < Height && i2 + patchRadY < other.getHeight()))
+    if (i1 + patchSideY > Height || i2 + patchSideY > other.getHeight())
       throw std::invalid_argument("Incorrect i-position in either matrix!");
 
-    if (!(j1 >= patchRadX && j2 >= patchRadX &&
-          j1 + patchRadX < Width && j2 + patchRadX < other.getWidth()))
+    if (j1 + patchSideX > Width || j2 + patchSideX > other.getWidth())
       throw std::invalid_argument("Incorrect j-position in either matrix!");
-
-    if (patchRadX <= 0 || patchRadY <= 0)
-      throw std::invalid_argument("patchRadX or patchRadY is incorrect!");
 #endif // CHECK_SSD_BOUNDARIES
 
     T result = 0;
-    for (int dy = -1 * patchRadY; dy <= patchRadY; ++dy)
-      for (int dx = -1 * patchRadX; dx <= patchRadX; ++dx) {
+    for (size_t dy = 0; dy < patchSideY; ++dy)
+      for (size_t dx = 0; dx < patchSideX; ++dx) {
         T diff = data[i1 + dy][j1 + dx] - other[i2 + dy][j2 + dx];
         result += diff * diff;
       }
@@ -467,32 +462,27 @@ public:
 
 
   // Returns known SSD shifted 1 pixel right.
-  // knownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY).
+  // knownSSD = SSD(other, i1, j1, i2, j2, patchSideX, patchSideY).
   T SSD_ShiftedRight(const Matrix<T> &other,
-                     unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                     int patchRadX, int patchRadY, T knownSSD) const {
+                     size_t i1, size_t j1, size_t i2, size_t j2,
+                     size_t patchSideX, size_t patchSideY, T knownSSD) const {
 #ifdef CHECK_SSD_BOUNDARIES
-    if (!(i1 >= patchRadY && i2 >= patchRadY &&
-          i1 + patchRadY < Height && i2 + patchRadY < other.getHeight()))
+    if (i1 + patchSideY > Height || i2 + patchSideY > other.getHeight())
       throw std::invalid_argument("Incorrect i-position in either matrix!");
 
-    if (!(j1 >= patchRadX && j2 >= patchRadX &&
-          j1 + patchRadX + 1 < Width && j2 + patchRadX + 1 < other.getWidth()))
+    if (j1 + patchSideX + 1 > Width || j2 + patchSideX + 1 > other.getWidth())
       throw std::invalid_argument("Incorrect j-position in either matrix!");
 
-    if (patchRadX <= 0 || patchRadY <= 0)
-      throw std::invalid_argument("patchRadX or patchRadY is incorrect!");
-
-    auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY);
+    auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchSideX, patchSideY);
     assert(std::abs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
 #endif // CHECK_SSD_BOUNDARIES
 
     T result = knownSSD;
-    for (int dy = -1 * patchRadY; dy <= patchRadY; ++dy) {
+    for (size_t dy = 0; dy < patchSideY; ++dy) {
       // Positive.
-      T diff1 = data[i1 + dy][j1 + patchRadX + 1] - other[i2 + dy][j2 + patchRadX + 1];
+      T diff1 = data[i1 + dy][j1 + patchSideX] - other[i2 + dy][j2 + patchSideX];
       // Negative.
-      T diff2 = data[i1 + dy][j1 - patchRadX] - other[i2 + dy][j2 - patchRadX];
+      T diff2 = data[i1 + dy][j1] - other[i2 + dy][j2];
       result = result + diff1 * diff1 - diff2 * diff2;
     }
     assert(result >= 0 && "SSD cannot be less than 0!");
@@ -502,30 +492,26 @@ public:
 
   // Returns known SSD shifted 1 pixel left.
   T SSD_ShiftedLeft(const Matrix<T> &other,
-                    unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                    int patchRadX, int patchRadY, T knownSSD) const {
+                    size_t i1, size_t j1, size_t i2, size_t j2,
+                    size_t patchSideX, size_t patchSideY, T knownSSD) const {
 #ifdef CHECK_SSD_BOUNDARIES
-    if (!(i1 >= patchRadY && i2 >= patchRadY &&
-          i1 + patchRadY < Height && i2 + patchRadY < other.getHeight()))
+    if (i1 + patchSideY > Height || i2 + patchSideY > other.getHeight())
       throw std::invalid_argument("Incorrect i-position in either matrix!");
 
-    if (!(j1 >= patchRadX + 1 && j2 >= patchRadX + 1 &&
-          j1 + patchRadX < Width && j2 + patchRadX < other.getWidth()))
+    if (!j1 || !j2 ||
+        j1 + patchSideX > Width || j2 + patchSideX > other.getWidth())
       throw std::invalid_argument("Incorrect j-position in either matrix!");
 
-    if (patchRadX <= 0 || patchRadY <= 0)
-      throw std::invalid_argument("patchRadX or patchRadY is incorrect!");
-
-    auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY);
+    auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchSideX, patchSideY);
     assert(std::abs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
 #endif // CHECK_SSD_BOUNDARIES
 
     T result = knownSSD;
-    for (int dy = -1 * patchRadY; dy <= patchRadY; ++dy) {
+    for (size_t dy = 0; dy < patchSideY; ++dy) {
       // Positive.
-      T diff1 = data[i1 + dy][j1 - patchRadX - 1] - other[i2 + dy][j2 - patchRadX - 1];
+      T diff1 = data[i1 + dy][j1 - 1] - other[i2 + dy][j2 - 1];
       // Negative.
-      T diff2 = data[i1 + dy][j1 + patchRadX] - other[i2 + dy][j2 + patchRadX];
+      T diff2 = data[i1 + dy][j1+patchSideX-1] - other[i2 + dy][j2+patchSideX-1];
       result = result + diff1 * diff1 - diff2 * diff2;
     }
     assert(result >= 0 && "SSD cannot be less than 0!");
@@ -534,32 +520,28 @@ public:
 
 
   // Returns known SSD shifted 1 pixel up.
-  // knownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY).
+  // knownSSD = SSD(other, i1, j1, i2, j2, patchSideX, patchSideY).
   T SSD_ShiftedUp(const Matrix<T> &other,
-                  unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                  int patchRadX, int patchRadY, T knownSSD) const {
+                  size_t i1, size_t j1, size_t i2, size_t j2,
+                  size_t patchSideX, size_t patchSideY, T knownSSD) const {
 #ifdef CHECK_SSD_BOUNDARIES
-    if (!(i1 >= patchRadY + 1 && i2 >= patchRadY + 1 &&
-          i1 + patchRadY < Height && i2 + patchRadY < other.getHeight()))
+    if (!i1 || !i2 ||
+        i1 + patchSideY > Height || i2 + patchSideY > other.getHeight())
       throw std::invalid_argument("Incorrect i-position in either matrix!");
 
-    if (!(j1 >= patchRadX && j2 >= patchRadX &&
-          j1 + patchRadX < Width && j2 + patchRadX < other.getWidth()))
+    if (j1 + patchSideX > Width || j2 + patchSideX > other.getWidth())
       throw std::invalid_argument("Incorrect j-position in either matrix!");
 
-    if (patchRadX <= 0 || patchRadY <= 0)
-      throw std::invalid_argument("patchRadX or patchRadY is incorrect!");
-
-    auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY);
+    auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchSideX, patchSideY);
     assert(std::abs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
 #endif // CHECK_SSD_BOUNDARIES
 
     T result = knownSSD;
-    for (int dx = -1 * patchRadX; dx <= patchRadX; ++dx) {
+    for (int dx = 0; dx < patchSideX; ++dx) {
       // Positive.
-      T diff1 = data[i1 - patchRadY - 1][j1 + dx] - other[i2 - patchRadY - 1][j2 + dx];
+      T diff1 = data[i1 - 1][j1 + dx] - other[i2 - 1][j2 + dx];
       // Negative.
-      T diff2 = data[i1 + patchRadY][j1 + dx] - other[i2 + patchRadY][j2 + dx];
+      T diff2 = data[i1+patchSideY-1][j1 + dx] - other[i2+patchSideY-1][j2 + dx];
       result = result + diff1 * diff1 - diff2 * diff2;
     }
     assert(result >= 0 && "SSD cannot be less than 0!");
@@ -568,61 +550,33 @@ public:
 
 
   // Returns known SSD shifted 1 pixel down.
-  // knownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY).
+  // knownSSD = SSD(other, i1, j1, i2, j2, patchSideX, patchSideY).
   T SSD_ShiftedDown(const Matrix<T> &other,
-                    unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                    int patchRadX, int patchRadY, T knownSSD) const {
+                    size_t i1, size_t j1, size_t i2, size_t j2,
+                    size_t patchSideX, size_t patchSideY, T knownSSD) const {
 #ifdef CHECK_SSD_BOUNDARIES
-    if (!(i1 >= patchRadY && i2 >= patchRadY &&
-          i1 + patchRadY + 1 < Height && i2 + patchRadY + 1 < other.getHeight()))
+    if (i1 + patchSideY + 1 > Height || i2 + patchSideY + 1 > other.getHeight())
       throw std::invalid_argument("Incorrect i-position in either matrix!");
 
-    if (!(j1 >= patchRadX && j2 >= patchRadX &&
-          j1 + patchRadX < Width && j2 + patchRadX < other.getWidth()))
+    if (j1 + patchSideX > Width || j2 + patchSideX > other.getWidth())
       throw std::invalid_argument("Incorrect j-position in either matrix!");
 
-    if (patchRadX <= 0 || patchRadY <= 0)
-      throw std::invalid_argument("patchRadX or patchRadY is incorrect!");
-
-    auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchRadX, patchRadY);
+    auto trustedKnownSSD = SSD(other, i1, j1, i2, j2, patchSideX, patchSideY);
     assert(std::abs(trustedKnownSSD - knownSSD) < 1e-5 && "knownSSD is out-of-date!");
 #endif // CHECK_SSD_BOUNDARIES
 
     T result = knownSSD;
-    for (int dx = -1 * patchRadX; dx <= patchRadX; ++dx) {
+    for (int dx = 0; dx < patchSideX; ++dx) {
       // Positive.
-      T diff1 = data[i1 + patchRadY + 1][j1 + dx] - other[i2 + patchRadY + 1][j2 + dx];
+      T diff1 = data[i1 + patchSideY][j1 + dx] - other[i2 + patchSideY][j2 + dx];
       // Negative.
-      T diff2 = data[i1 - patchRadY][j1 + dx] - other[i2 - patchRadY][j2 + dx];
+      T diff2 = data[i1][j1 + dx] - other[i2][j2 + dx];
       result = result + diff1 * diff1 - diff2 * diff2;
     }
     assert(result >= 0 && "SSD cannot be less than 0!");
     return result;
   }
 
-
-
-  void PRINT_SSD(const Matrix<T> &other,
-                 unsigned i1, unsigned j1, unsigned i2, unsigned j2,
-                 int patchRadX, int patchRadY = 0) const {
-    if (!patchRadY)
-      patchRadY = patchRadX;
-    assert(i1 >= patchRadY && i2 >= patchRadY &&
-      i1 + patchRadY < Height && i2 + patchRadY < other.getHeight());
-    assert(j1 >= patchRadX && j2 >= patchRadX &&
-      j1 + patchRadX < Width && j2 + patchRadX < other.getWidth());
-    assert(patchRadX > 0 && patchRadY > 0);
-    T result = 0;
-    for (int dy = -1 * patchRadY; dy <= patchRadY; ++dy) {
-      for (int dx = -1 * patchRadX; dx <= patchRadX; ++dx) {
-        std::cout.width(4);
-        std::cout << other[i2 + dy][j2 + dx] << ' ';
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-    std::cout << std::endl;
-  }
 
 private:
 
@@ -639,8 +593,8 @@ private:
     return source.substr(source.length() - ext.length(), ext.length()) == ext;
   }
 
-  unsigned Height;
-  unsigned Width;
+  size_t Height;
+  size_t Width;
   T **data;
 };
 

@@ -5,10 +5,32 @@
 
 #include <fstream>
 #include <type_traits> // std::enable_if
+#include <random>
+
+class RandGen {
+public:
+  static RandGen *GetInstance() {
+    if (!instance)
+      instance = new RandGen;
+    return instance;
+  }
+
+  int Random(int lowerLimit, int upperLimit);
+private:
+  RandGen() {
+    generator.seed(123);
+  }
+
+  RandGen(const RandGen &r) = delete;
+  RandGen& operator=(const RandGen &r) = delete;
+
+  static RandGen *instance;
+  std::mt19937 generator;
+};
+
+#define RandomWithLimits(a, b) RandGen::GetInstance()->Random(a, b)
 
 constexpr double EPS = 1.0e-5;
-
-int RandomWithLimits(int lowerLimit, int upperLimit);
 
 template<class T>
 void FillRandomizedWithLimits(Matrix<T> &m, int lowerLimit, int upperLimit) {

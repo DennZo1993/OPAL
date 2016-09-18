@@ -23,17 +23,17 @@ protected:
   Matrix<double> small1;
   Matrix<double> small2;
 
-  unsigned Height;
-  unsigned Width;
+  size_t Height;
+  size_t Width;
 };
 
 
 TEST_F(SSDShiftTest, TestShiftRight) {
-  for (int patchSize = 1; patchSize < 10; ++patchSize) {
-    int i1 = RandomWithLimits(patchSize + 1, Height - patchSize - 1);
-    int j1 = RandomWithLimits(patchSize + 1, Width - patchSize - 1);
-    int i2 = RandomWithLimits(patchSize + 1, Height - patchSize - 1);
-    int j2 = RandomWithLimits(patchSize + 1, Width - patchSize - 1);
+  for (int patchSize = 1; patchSize < 22; patchSize += 2) {
+    int i1 = RandomWithLimits(0, Height - patchSize);
+    int j1 = RandomWithLimits(0, Width - patchSize);
+    int i2 = RandomWithLimits(0, Height - patchSize);
+    int j2 = RandomWithLimits(0, Width - patchSize);
 
     auto originalSSD = src.SSD(dst, i1, j1, i2, j2, patchSize, patchSize);
     auto shiftedSSD = src.SSD_ShiftedRight(dst, i1, j1, i2, j2, patchSize,
@@ -97,24 +97,24 @@ TEST_F(SSDShiftTest, TestShiftDown) {
 
 TEST_F(SSDShiftTest, TestSSDFail1) {
   // Incorrect patch sizes.
-  ASSERT_THROW(small1.SSD(small2, 1, 1, 1, 1, 0, 1), std::invalid_argument);
-  ASSERT_THROW(small1.SSD(small2, 1, 1, 1, 1, 1, 0), std::invalid_argument);
-  ASSERT_THROW(small1.SSD(small2, 1, 1, 1, 1, 2, 1), std::invalid_argument);
-  ASSERT_THROW(small1.SSD(small2, 1, 1, 1, 1, 1, 5), std::invalid_argument);
+  ASSERT_THROW(small1.SSD(small2, 0, 0, 0, 0, 10, 1), std::invalid_argument);
+  ASSERT_THROW(small1.SSD(small2, 0, 0, 0, 0, 3, 5), std::invalid_argument);
+  ASSERT_THROW(small1.SSD(small2, 0, 0, 0, 0, 5, 1), std::invalid_argument);
+  ASSERT_THROW(small1.SSD(small2, 0, 0, 0, 0, 1, -1), std::invalid_argument);
 }
 
 
 TEST_F(SSDShiftTest, TestShiftFail1) {
-  auto orig = small1.SSD(small2, 1, 1, 1, 1, 1, 1);
+  auto orig = small1.SSD(small2, 0, 0, 0, 0, 3, 3);
   ASSERT_DOUBLE_EQ(9.0, orig);
 
-  ASSERT_THROW(small1.SSD_ShiftedRight(small2, 1, 1, 1, 1, 1, 1, orig),
+  ASSERT_THROW(small1.SSD_ShiftedRight(small2, 0, 0, 0, 0, 3, 3, orig),
                std::invalid_argument);
-  ASSERT_THROW(small1.SSD_ShiftedLeft(small2, 1, 1, 1, 1, 1, 1, orig),
+  ASSERT_THROW(small1.SSD_ShiftedLeft(small2, 0, 0, 0, 0, 3, 3, orig),
                std::invalid_argument);
-  ASSERT_THROW(small1.SSD_ShiftedUp(small2, 1, 1, 1, 1, 1, 1, orig),
+  ASSERT_THROW(small1.SSD_ShiftedUp(small2, 0, 0, 0, 0, 3, 3, orig),
                std::invalid_argument);
-  ASSERT_THROW(small1.SSD_ShiftedDown(small2, 1, 1, 1, 1, 1, 1, orig),
+  ASSERT_THROW(small1.SSD_ShiftedDown(small2, 0, 0, 0, 0, 3, 3, orig),
                std::invalid_argument);
 }
 
