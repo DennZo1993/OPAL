@@ -49,6 +49,8 @@ private:
   size_t ImageWidth;
 
   // Input image to be segmented. Always Database[0].
+  // offsetX <- FieldX[i][j], offsetY <- FieldY[i][j], T <- FieldT[i][j]
+  // InputImage[i][j] -> Database.getImage(T)[i+offsetY][j + offsetX]
   Matrix<ImagePixelType> InputImage;
 
   using RandomGeneratorType = std::mt19937;

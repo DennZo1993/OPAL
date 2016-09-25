@@ -48,9 +48,12 @@ TEST(OPAL, Initialization) {
   for (size_t i = settings.patchRadius; i+settings.patchRadius < fieldX.getHeight(); ++i) {
     for (size_t j = settings.patchRadius; j+settings.patchRadius < fieldX.getWidth(); ++j) {
       auto ssd = ssdMap[i][j];
-      ASSERT_DOUBLE_EQ(ssd, db.getImage(0).SSD(db.getImage(1), i, j,
-                                               i+fieldY[i][j], j+fieldX[i][j],
-                                               settings.patchRadius, settings.patchRadius));
+      auto x = j + fieldX[i][j];
+      auto y = i + fieldY[i][j];
+      ASSERT_DOUBLE_EQ(ssd, db.getImage(0).SSD(db.getImage(1),
+                                               i-settings.patchRadius, j-settings.patchRadius,
+                                               y-settings.patchRadius, x-settings.patchRadius,
+                                               settings.patchSide, settings.patchSide));
     } // for(i)
   } // for(j)
 

@@ -80,8 +80,11 @@ void OPAL::UpdateSSDMap() {
       const auto &curDst = Database.getImage(FieldT[i][j]);
       auto curX = j + FieldX[i][j];
       auto curY = i + FieldY[i][j];
-      SSDMap[i][j] = InputImage.SSD(curDst, i, j, curY, curX,
-                                    Sets.patchRadius, Sets.patchRadius);
+      SSDMap[i][j] =
+        InputImage.SSD(curDst,
+                       i - Sets.patchRadius, j - Sets.patchRadius,
+                       curY - Sets.patchRadius, curX - Sets.patchRadius,
+                       Sets.patchSide, Sets.patchSide);
     } // for (j)
   } // for (i)
 }
