@@ -1,15 +1,21 @@
 #pragma once
 
+#include <string>
+
 // A lightweight class containing various OPAL parameters.
 struct OPALSettings {
 public:
-  OPALSettings(size_t _initWindowRadius,
-               size_t _patchRadius
+  OPALSettings(size_t _initWindowRadius
+             , size_t _patchRadius
+             , bool _intermediateSaving
+             , const std::string &_savingPath
               )
     : initWindowRadius(_initWindowRadius)
     , initWindowSide(2 * _initWindowRadius + 1)
     , patchRadius(_patchRadius)
     , patchSide(2 * _patchRadius + 1)
+    , intermediateSaving(_intermediateSaving)
+    , intermediateSavingPath(_savingPath)
   {}
 
 
@@ -23,12 +29,16 @@ public:
   size_t patchRadius;
   size_t patchSide;
 
+  // Enable/disable intermediate saving.
+  bool intermediateSaving;
+  std::string intermediateSavingPath;
 
   // Default values for all settings.
   static OPALSettings GetDefaults() {
-    return OPALSettings(
-      /*initWindowRadius=*/ 10,
-      /*patchRadius=*/      2
+    return OPALSettings(10    /* initWindowRadius       */
+                      , 2     /* patchRadius            */
+                      , false /* intermediateSaving     */
+                      , ""    /* intermediateSavingPath */
                        );
   }
 };

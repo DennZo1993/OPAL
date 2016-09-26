@@ -57,6 +57,8 @@ private:
   RandomGeneratorType randGen;
 
 private:
+  // Save current displacement fields.
+  void SaveCurrentFields(const std::string &fileName) const;
 
   // Recalculate the whole SSD map.
   void UpdateSSDMap();

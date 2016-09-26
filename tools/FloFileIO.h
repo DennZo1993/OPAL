@@ -3,14 +3,17 @@
 #include "../lib/Matrix.h"
 #include <fstream>
 #include <stdexcept>
+#include <cmath>
 
 namespace FlowIO {
 
-constexpr float TAG_FLOAT = 202021.25f;
-constexpr size_t BYTES_COUNT = 4;
+static constexpr float TAG_FLOAT = 202021.25f;
+static constexpr size_t BYTES_COUNT = 4;
+static constexpr float EPS = 0.0001f;
 
 template<class T>
-void ReadFlowFile(const std::string &fileName, Matrix<T> &FlowX, Matrix<T> &FlowY) {
+void ReadFlowFile(const std::string &fileName,
+                  Matrix<T> &FlowX, Matrix<T> &FlowY) {
   std::ifstream ifs;
   ifs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
   ifs.open(fileName, std::ios::binary);
@@ -19,7 +22,7 @@ void ReadFlowFile(const std::string &fileName, Matrix<T> &FlowX, Matrix<T> &Flow
   float tag;
 
   ifs.read(reinterpret_cast<char*>(&tag), BYTES_COUNT);
-  if (tag != TAG_FLOAT)
+  if (std::abs(tag - TAG_FLOAT) > EPS)
     throw std::runtime_error("Wrong TAG read from file " + fileName);
 
   ifs.read(reinterpret_cast<char*>(&width), BYTES_COUNT);
@@ -40,7 +43,10 @@ void ReadFlowFile(const std::string &fileName, Matrix<T> &FlowX, Matrix<T> &Flow
 
 
 template<class T>
-void WriteFlowFile(const std::string &fileName, const Matrix<T> &FlowX, const Matrix<T> &FlowY) {
+void WriteFlowFile(const std::string &fileName,
+                   const Matrix<T> &FlowX, const Matrix<T> &FlowY) {
+  if (FlowX.isEmpty() || FlowY.isEmpty())
+    throw std::invalid_argument("One of the matrices is empty!");
   if (FlowX.getHeight() != FlowY.getHeight())
     throw std::invalid_argument("Matrices have different heights!");
   if (FlowX.getWidth() != FlowY.getWidth())
@@ -69,3 +75,4 @@ void WriteFlowFile(const std::string &fileName, const Matrix<T> &FlowX, const Ma
 }
 
 } // FlowIO namespace
+

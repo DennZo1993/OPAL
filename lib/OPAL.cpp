@@ -1,5 +1,17 @@
 #include "OPAL.h"
 #include <stdexcept>
+#include "../tools/FloFileIO.h"
+
+static std::string
+FullFileName(const std::string &path, const std::string &name) {
+  std::string result = path;
+
+  if (!result.empty() && result.back() != '/')
+    result += "/";
+
+  return result += name;
+}
+
 
 OPAL::OPAL(const OPALSettings &settings, const DatabaseType &database)
   : Sets(settings)
@@ -71,6 +83,19 @@ void OPAL::ConstrainedInitialization() {
   } // for (i)
 
   UpdateSSDMap();
+
+  // Save current result.
+  SaveCurrentFields("0_Initialization.flo");
+}
+
+
+void OPAL::SaveCurrentFields(const std::string &fileName) const {
+  // If intermediate saving is not enabled, we are done.
+  if (!Sets.intermediateSaving)
+    return;
+
+  auto fullFileName = FullFileName(Sets.intermediateSavingPath, fileName);
+  FlowIO::WriteFlowFile(fullFileName, FieldX, FieldY);
 }
 
 

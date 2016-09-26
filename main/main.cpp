@@ -13,13 +13,9 @@ int main(int argc, char **argv) {
     db.Add(argv[3], argv[4]);
 
     OPALSettings settings = OPALSettings::GetDefaults();
+    settings.intermediateSaving = true;
     OPAL opal(settings, db);
     opal.ConstrainedInitialization();
-
-    const auto &xFlow = opal.getFieldX();
-    const auto &yFlow = opal.getFieldY();
-
-    FlowIO::WriteFlowFile("init.flo", xFlow, yFlow);
   } catch (std::runtime_error &ex) {
     std::cerr << "Runtime exception caught!\n" << ex.what() << std::endl;
     return 1;
