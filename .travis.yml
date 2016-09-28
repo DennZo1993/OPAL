@@ -44,8 +44,17 @@ matrix:
       env: C_COMPILER=clang-3.7 CXX_COMPILER=clang++-3.7 GTEST_COLOR=1
 
 install:
-  - gem install coveralls-lcov
-  - lcov --version
+  - |
+    if [[ "$CXX_COMPILER" == "g++-5" ]]; then
+      cd ${TRAVIS_BUILD_DIR}
+      wget "http://downloads.sourceforge.net/ltp/lcov-1.12.tar.gz"
+      tar -zxvf lcov-1.12.tar.gz
+      make -C lcov-1.12/ install PREFIX=lcov-1.12
+      alias lcov="lcov-1.12/bin/lcov"
+
+      lcov --version
+      gem install coveralls-lcov
+    fi
 
 script:
   - cd ${TRAVIS_BUILD_DIR}
