@@ -79,8 +79,8 @@ RGBPixel Flow2Color::ComputeColorForFlowPixel(float fx, float fy) {
 bool Flow2Color::UnknownFlow(float x, float y) {
   return (std::abs(x) > UNKNOWN_FLOW_THRESH)
       || (std::abs(y) > UNKNOWN_FLOW_THRESH)
-      || isnan(x)
-      || isnan(y);
+      || std::isnan(x)
+      || std::isnan(y);
 }
 
 
