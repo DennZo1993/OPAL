@@ -13,7 +13,6 @@ matrix:
             - g++-4.9
             - cmake
             - cmake-data
-            - lcov
       env: C_COMPILER=gcc-4.9 CXX_COMPILER=g++-4.9 GTEST_COLOR=1
 
     - compiler: gcc
@@ -22,12 +21,13 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - george-edison55-precise-backports
+            - sourceline: 'deb http://us.archive.ubuntu.com/ubuntu xenial/universe'
           packages:
             - gcc-5
             - g++-5
             - cmake
             - cmake-data
-            - lcov
+            - lcov-1.12
       env: C_COMPILER=gcc-5 CXX_COMPILER=g++-5 GTEST_COLOR=1
 
     - compiler: clang
@@ -41,7 +41,6 @@ matrix:
             - clang-3.7
             - cmake
             - cmake-data
-            - lcov
       env: C_COMPILER=clang-3.7 CXX_COMPILER=clang++-3.7 GTEST_COLOR=1
 
 install:
