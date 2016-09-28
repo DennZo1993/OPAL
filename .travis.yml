@@ -58,9 +58,9 @@ after_success:
   - |
     if [[ "$CXX_COMPILER" == "g++-5" ]]; then
       cd ${TRAVIS_BUILD_DIR}
-      lcov --directory . --capture --output-file coverage.info
-      lcov --remove coverage.info 'test/*' '/usr/*' '/gtest/*' --output-file coverage.info
-      lcov --list coverage.info
+      lcov --gcov-tool gcov-5 --directory . --capture --output-file coverage.info
+      lcov --gcov-tool gcov-5 --remove coverage.info 'test/*' '/usr/*' '/gtest/*' --output-file coverage.info
+      lcov --gcov-tool gcov-5 --list coverage.info
       coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
     fi
 
