@@ -1,13 +1,14 @@
-set (SOURCES RGBAPixel.cpp
-             OPAL.cpp)
+set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../lodepng/lodepng.cpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/../RGBAPixel.cpp
+             AnalyzeHeader.cpp
+             ImageReader.cpp
+             PngImageWriter.cpp)
 
-add_subdirectory(ImageIO)
-
-add_library(libOPAL STATIC ${SOURCES})
+add_library(libImageIO STATIC ${SOURCES})
 
 if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU"))
-  target_compile_options(libOPAL PRIVATE
+  target_compile_options(libImageIO PRIVATE
                          -std=c++11
                          -Werror
                          -Wall -Wextra
@@ -19,5 +20,5 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
                          -Wuninitialized)
 endif()
 
-target_link_libraries(libOPAL libImageIO)
-target_include_directories(libOPAL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(libImageIO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)

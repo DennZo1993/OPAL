@@ -28,12 +28,13 @@ OPAL::OPAL(const OPALSettings &settings, const DatabaseType &database)
   ImageWidth = Database.getImageWidth();
 
   InputImage = Database.getImage(0);
+  OutputSegmentation.Resize(ImageHeight, ImageWidth);
 
   // Allocate memory, but don't fill.
-  FieldX.Allocate(ImageHeight, ImageWidth);
-  FieldY.Allocate(ImageHeight, ImageWidth);
-  FieldT.Allocate(ImageHeight, ImageWidth);
-  SSDMap.Allocate(ImageHeight, ImageWidth);
+  FieldX.Resize(ImageHeight, ImageWidth);
+  FieldY.Resize(ImageHeight, ImageWidth);
+  FieldT.Resize(ImageHeight, ImageWidth);
+  SSDMap.Resize(ImageHeight, ImageWidth);
 
   // Initialize random generator.
   std::random_device rd;
@@ -75,9 +76,9 @@ void OPAL::ConstrainedInitialization() {
         offsetX = xUpperConstraint - j;
 
       // Initialize the fields.
-      FieldT[i][j] = t;
-      FieldX[i][j] = offsetX;
-      FieldY[i][j] = offsetY;
+      FieldT(i, j) = t;
+      FieldX(i, j) = offsetX;
+      FieldY(i, j) = offsetY;
 
     } // for (j)
   } // for (i)
@@ -86,6 +87,120 @@ void OPAL::ConstrainedInitialization() {
 
   // Save current result.
   SaveCurrentFields("0_Initialization.flo");
+}
+
+
+void OPAL::Propagation(size_t iteration) {
+  size_t xStart = iteration % 2 ? ImageWidth - Sets.patchRadius - 1
+                                : Sets.patchRadius;
+
+  size_t xEnd   = iteration % 2 ? Sets.patchRadius
+                                : ImageWidth - Sets.patchRadius - 1;
+
+  size_t yStart = iteration % 2 ? ImageHeight - Sets.patchRadius - 1
+                                : Sets.patchRadius;
+
+  size_t yEnd   = iteration % 2 ? Sets.patchRadius
+                                : ImageHeight - Sets.patchRadius - 1;
+
+  int    delta  = iteration % 2 ? -1 : 1;
+
+  size_t propagatedPixels = 0;
+  for (size_t y = yStart; y != yEnd; y += delta)
+    for (size_t x = xStart; x != xEnd; x += delta) {
+      propagatedPixels += PropagatePixel(y, x, delta);
+    }
+
+  std::cout << propagatedPixels << std::endl;
+  SaveCurrentFields("Iteration_" + std::to_string(iteration));
+}
+
+//#define DUMP
+
+int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
+  SSDType current    = SSDMap(i, j);
+  SSDType vertical   = SSDMap(i + delta, j);
+  SSDType horizontal = SSDMap(i, j + delta);
+
+#ifdef DUMP
+  std::cout << " --- current --- " << std::endl;
+  std::cout << current << std::endl;
+  std::cout << " --- vertical --- " << std::endl;
+  std::cout << vertical << std::endl;
+  std::cout << " --- horizontal --- " << std::endl;
+  std::cout << horizontal << std::endl;
+#endif
+  if (current < vertical && current < horizontal)
+    return 0;
+
+  SSDType fromVertical = vertical;
+  SSDType fromHorizontal = horizontal;
+  if (delta > 0) {
+    fromHorizontal.ShiftLeft();
+    fromVertical.ShiftUp();
+  } else {
+    fromVertical.ShiftDown();
+    fromHorizontal.ShiftRight();
+  }
+
+#ifdef DUMP
+  std::cout << " --- from vertical --- " << std::endl;
+  std::cout << fromVertical << std::endl;
+  std::cout << " --- from horizontal --- " << std::endl;
+  std::cout << fromHorizontal << std::endl;
+
+
+  getchar();
+#endif
+  if (fromVertical < current && fromVertical < fromHorizontal) {
+    FieldX(i, j) = FieldX(i + delta, j);
+    FieldY(i, j) = FieldY(i + delta, j);
+    FieldT(i, j) = FieldT(i + delta, j);
+    SSDMap(i, j) = fromVertical;
+#ifdef DUMP
+    std::cout << " VERTICAL " << std::endl;
+#endif
+    return 1;
+  }
+
+  if (fromHorizontal < current && fromHorizontal < fromVertical) {
+    FieldX(i, j) = FieldX(i, j + delta);
+    FieldY(i, j) = FieldY(i, j + delta);
+    FieldT(i, j) = FieldT(i, j + delta);
+    SSDMap(i, j) = fromHorizontal;
+
+#ifdef DUMP
+    std::cout << " HORIZONTAL " << std::endl;
+#endif
+    return 1;
+  }
+
+#ifdef DUMP
+  std::cout << " ------------------------- " << std::endl;
+  std::cout << " ----- ITERATION END ----- " << std::endl;
+#endif
+  return 0;
+}
+
+
+void OPAL::BuildSegmentation() {
+  for (size_t i = Sets.patchRadius; i + Sets.patchRadius < ImageHeight; ++i)
+    for (size_t j = Sets.patchRadius; j + Sets.patchRadius < ImageWidth; ++j) {
+      const auto &curDst = Database.getSegmentation(FieldT(i, j));
+      const auto OffsetX = FieldX(i, j);
+      const auto OffsetY = FieldY(i, j);
+
+      OutputSegmentation(i,j) = curDst(i + OffsetY, j + OffsetX);
+    }
+}
+
+
+void OPAL::Run() {
+  ConstrainedInitialization();
+  for (size_t i = 0; i < Sets.maxIterations; ++i)
+    Propagation(i);
+
+  BuildSegmentation();
 }
 
 
@@ -99,17 +214,21 @@ void OPAL::SaveCurrentFields(const std::string &fileName) const {
 }
 
 
+OPAL::SSDType OPAL::SSDAt(size_t i, size_t j) const {
+  const auto &curDst = Database.getImage(FieldT(i, j));
+  auto curX = j + FieldX(i, j);
+  auto curY = i + FieldY(i, j);
+
+  return SSDType(&InputImage, i, j,
+                 &curDst, curY, curX,
+                 Sets.patchRadius);
+}
+
+
 void OPAL::UpdateSSDMap() {
   for (size_t i = Sets.patchRadius; i + Sets.patchRadius < ImageHeight; ++i) {
     for (size_t j = Sets.patchRadius; j + Sets.patchRadius < ImageWidth; ++j) {
-      const auto &curDst = Database.getImage(FieldT[i][j]);
-      auto curX = j + FieldX[i][j];
-      auto curY = i + FieldY[i][j];
-      SSDMap[i][j] =
-        InputImage.SSD(curDst,
-                       i - Sets.patchRadius, j - Sets.patchRadius,
-                       curY - Sets.patchRadius, curX - Sets.patchRadius,
-                       Sets.patchSide, Sets.patchSide);
+      SSDMap(i, j) = SSDAt(i, j);
     } // for (j)
   } // for (i)
 }

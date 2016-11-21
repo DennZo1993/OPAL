@@ -31,26 +31,26 @@ void Flow2Color::MakeColorWheel() {
 
   size_t k = 0;
   for (size_t i = 0; i < RY; ++i)
-    ColorWheel[k++] = RGBPixel(255,	255*i/RY,	0);
+    ColorWheel[k++] = RGBAPixel(255,	255*i/RY,	0);
 
   for (size_t i = 0; i < YG; ++i)
-    ColorWheel[k++] = RGBPixel(255-255*i/YG, 255, 0);
+    ColorWheel[k++] = RGBAPixel(255-255*i/YG, 255, 0);
 
   for (size_t i = 0; i < GC; ++i)
-    ColorWheel[k++] = RGBPixel(0,	255, 255*i/GC);
+    ColorWheel[k++] = RGBAPixel(0,	255, 255*i/GC);
 
   for (size_t i = 0; i < CB; ++i)
-    ColorWheel[k++] = RGBPixel(0, 255-255*i/CB, 255);
+    ColorWheel[k++] = RGBAPixel(0, 255-255*i/CB, 255);
 
   for (size_t i = 0; i < BM; ++i)
-    ColorWheel[k++] = RGBPixel(255*i/BM, 0,	255);
+    ColorWheel[k++] = RGBAPixel(255*i/BM, 0,	255);
 
   for (size_t i = 0; i < MR; ++i)
-    ColorWheel[k++] = RGBPixel(255,	0, 255-255*i/MR);
+    ColorWheel[k++] = RGBAPixel(255,	0, 255-255*i/MR);
 }
 
 
-RGBPixel Flow2Color::ComputeColorForFlowPixel(float fx, float fy) {
+RGBAPixel Flow2Color::ComputeColorForFlowPixel(float fx, float fy) {
   float rad = sqrt(fx * fx + fy * fy);
   float a = atan2(-fy, -fx) / PI;
   float fk = (a + 1.0) / 2.0 * (NCOLORS-1);
@@ -59,7 +59,7 @@ RGBPixel Flow2Color::ComputeColorForFlowPixel(float fx, float fy) {
   float f = fk - k0;
   //f = 0; // uncomment to see original color wheel
 
-  RGBPixel result;
+  RGBAPixel result;
 
   for (size_t channel = 0; channel < 3; ++channel) {
     float col0 = ColorWheel[k0][channel] / 255.0;
@@ -69,7 +69,7 @@ RGBPixel Flow2Color::ComputeColorForFlowPixel(float fx, float fy) {
         col = 1 - rad * (1 - col); // increase saturation with radius
     else
         col *= .75; // out of range
-    result[channel] = static_cast<RGBPixel::PixelType>(255.0 * col);
+    result[channel] = static_cast<RGBAPixel::PixelType>(255.0 * col);
   }
 
   return result;
@@ -112,7 +112,7 @@ void Flow2Color::Convert() {
     for (size_t x = 0; x < FlowX.getWidth(); ++x) {
       float fx = FlowX[y][x];
       float fy = FlowY[y][x];
-      RGBPixel resPixel;
+      RGBAPixel resPixel;
       if (!UnknownFlow(fx, fy))
         resPixel = ComputeColorForFlowPixel(fx/maxrad, fy/maxrad);
 
@@ -126,8 +126,6 @@ void Flow2Color::Convert() {
 
 
 void Flow2Color::WriteToFile(const std::string &fileName) const {
-  std::vector<RGBPixel::PixelType> png;
-
   unsigned error = lodepng::encode(fileName, rawPixels, FlowX.getWidth(), FlowY.getHeight());
   (void) error;
 }

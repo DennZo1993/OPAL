@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Matrix.h"
+#include "Image.h"
+#include "ImageTypes.h"
+#include "ImageIO/ImageIO.h"
 
 #include <stdexcept>
 #include <cassert>
@@ -8,23 +10,22 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 
 template<class ImagePixelType, class SegmentationPixelType>
 class ImageDatabase {
 public:
-  using ImageType = Matrix<ImagePixelType>;
-  using SegmentationType = Matrix<SegmentationPixelType>;
+  using ImageType        = Image<ImagePixelType>;
+  using SegmentationType = Image<SegmentationPixelType>;
 
   ImageDatabase() : imageHeight(0), imageWidth(0) {}
 
 
   // Throws std::runtime_error.
   void Add(const std::string &imageFileName, const std::string &segFileName) {
-    Matrix<ImagePixelType> imgMat;
-    Matrix<SegmentationPixelType> segMat;
-    imgMat.ReadFromFile(imageFileName);
-    segMat.ReadFromFile(segFileName);
+    auto imgMat = ImageIO::ReadImage<ImagePixelType>(imageFileName);
+    auto segMat = ImageIO::ReadImage<SegmentationPixelType>(segFileName);
 
     // Don't add empty images.
     if (imgMat.isEmpty() || segMat.isEmpty())
@@ -50,21 +51,8 @@ public:
           "Size of new image/segmentation doesn't suit the database!");
     }
 
-    // Here we must have 2 non-empty images with the same dimensions that fit the
-    // dimensions of database.
-    assert(!imgMat.isEmpty() && !segMat.isEmpty() &&
-           "At least one of the images is empty!");
-    assert(imgMat.getHeight() == segMat.getHeight() &&
-           imgMat.getWidth() == segMat.getWidth() &&
-           "Image and segmentation sizes must be the same!");
-    assert(imgMat.getHeight() == imageHeight && imgMat.getWidth() == imageWidth
-           && "Image size doesn't match the size of other images in database!");
-
     images.push_back(imgMat);
     segmentations.push_back(segMat);
-
-    assert(images.size() == segmentations.size() &&
-           "Image and segmentation databases must have the same size!");
   }
 
 

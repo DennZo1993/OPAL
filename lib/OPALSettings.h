@@ -9,6 +9,7 @@ public:
              , size_t _patchRadius
              , bool _intermediateSaving
              , const std::string &_savingPath
+             , size_t _maxIter
               )
     : initWindowRadius(_initWindowRadius)
     , initWindowSide(2 * _initWindowRadius + 1)
@@ -16,6 +17,7 @@ public:
     , patchSide(2 * _patchRadius + 1)
     , intermediateSaving(_intermediateSaving)
     , intermediateSavingPath(_savingPath)
+    , maxIterations(_maxIter)
   {}
 
 
@@ -33,12 +35,15 @@ public:
   bool intermediateSaving;
   std::string intermediateSavingPath;
 
+  size_t maxIterations;
+
   // Default values for all settings.
   static OPALSettings GetDefaults() {
     return OPALSettings(10    /* initWindowRadius       */
-                      , 2     /* patchRadius            */
+                      , 3     /* patchRadius            */
                       , false /* intermediateSaving     */
                       , ""    /* intermediateSavingPath */
+                      , 30
                        );
   }
 };
