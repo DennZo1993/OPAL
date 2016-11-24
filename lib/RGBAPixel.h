@@ -19,7 +19,7 @@ public:
   {}
 
   // Gray-scale pixel from intensity value.
-  RGBAPixel(PixelType intensity)
+  explicit RGBAPixel(PixelType intensity)
     : r(intensity)
     , g(intensity)
     , b(intensity)

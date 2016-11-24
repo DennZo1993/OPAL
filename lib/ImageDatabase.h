@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Image.h"
-#include "ImageTypes.h"
 #include "ImageIO/ImageIO.h"
 
 #include <stdexcept>
