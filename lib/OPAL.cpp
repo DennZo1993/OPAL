@@ -111,7 +111,7 @@ void OPAL::Propagation(size_t iteration) {
       propagatedPixels += PropagatePixel(y, x, delta);
     }
 
-  std::cout << propagatedPixels << std::endl;
+  //std::cout << propagatedPixels << std::endl;
   SaveCurrentFields("Iteration_" + std::to_string(iteration));
 }
 

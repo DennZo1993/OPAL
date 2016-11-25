@@ -40,7 +40,7 @@ public:
   // Default values for all settings.
   static OPALSettings GetDefaults() {
     return OPALSettings(10    /* initWindowRadius       */
-                      , 3     /* patchRadius            */
+                      , 10     /* patchRadius            */
                       , false /* intermediateSaving     */
                       , ""    /* intermediateSavingPath */
                       , 30
