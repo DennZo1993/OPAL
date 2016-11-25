@@ -1,42 +1,42 @@
 #include "../Common.h"
 
-TEST(MatrixMiscTest, TestCast) {
+TEST(ImageMiscTest, TestCast) {
   // Test casting non-empty matrix. Floor.
-  Matrix<double> m1(2, 3, 1.3);
-  Matrix<int> m2 = m1.castTo<int>();
+  Image<double> m1(2, 3, 1.3);
+  Image<int> m2 = m1.castTo<int>();
 
-  ASSERT_TRUE(MatrixHasSize(m2, 2, 3));
-  ASSERT_TRUE(MatrixIsFilledWith(m2, 1));
+  ASSERT_TRUE(ImageHasSize(m2, 2, 3));
+  ASSERT_TRUE(ImageIsFilledWith(m2, 1));
 }
 
-TEST(MatrixMiscTest, TestCastEmpty)  {
+TEST(ImageMiscTest, TestCastEmpty)  {
   // Test casting empty matrix.
-  Matrix<double> m1;
-  Matrix<int> m2 = m1.castTo<int>();
+  Image<double> m1;
+  Image<int> m2 = m1.castTo<int>();
 
-  ASSERT_TRUE(MatrixIsEmpty(m2));
+  ASSERT_TRUE(ImageIsEmpty(m2));
 }
 
-TEST(MatrixMiscTest, TestFillEmpty) {
-  Matrix<float> m1;
+TEST(ImageMiscTest, TestFillEmpty) {
+  Image<float> m1;
   m1.Fill(5.0);
 
-  ASSERT_TRUE(MatrixIsEmpty(m1));
+  ASSERT_TRUE(ImageIsEmpty(m1));
 }
 
-TEST(MatrixMiscTest, TestFillNonEmpty) {
-  Matrix<int> m1(3, 4, 2);
+TEST(ImageMiscTest, TestFillNonEmpty) {
+  Image<int> m1(3, 4, 2);
   m1.Fill(10);
 
-  ASSERT_TRUE(MatrixHasSize(m1, 3, 4));
-  ASSERT_TRUE(MatrixIsFilledWith(m1, 10));
+  ASSERT_TRUE(ImageHasSize(m1, 3, 4));
+  ASSERT_TRUE(ImageIsFilledWith(m1, 10));
 }
 
-TEST(MatrixMiscTest, TestAccessFail1) {
-  Matrix<int> m1(5, 10, 3);
+TEST(ImageMiscTest, TestAccessFail1) {
+  Image<int> m1(5, 10, 3);
 
-  ASSERT_THROW(m1[6][0], std::out_of_range);
-  ASSERT_THROW(m1[5][9], std::out_of_range);
-  ASSERT_THROW(m1[-1][0], std::out_of_range);
+  ASSERT_THROW(m1(6, 0), std::out_of_range);
+  ASSERT_THROW(m1(5, 9), std::out_of_range);
+  ASSERT_THROW(m1(-1, 0), std::out_of_range);
 }
 

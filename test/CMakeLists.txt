@@ -73,13 +73,13 @@ SET(TEST_SOURCES main.cpp
                  Common.cpp
                  Matrix/Constructors.cpp
                  Matrix/Allocation.cpp
-                 Matrix/Read.cpp
-                 Matrix/Write.cpp
+                 #Matrix/Read.cpp
+                 #Matrix/Write.cpp
                  Matrix/Misc.cpp
                  Matrix/AdditionSubtraction.cpp
                  Matrix/Relation.cpp
                  Matrix/Assign.cpp
-                 Matrix/SSD.cpp
+                 #Matrix/SSD.cpp
 
                  ImageDatabaseTests.cpp
 

@@ -16,7 +16,11 @@ public:
 
   // Creates a new image and fills it with \p value.
   Image(size_t h, size_t w, const T &value = T())
-    : Height(h), Width(w), data(h * w, value) {}
+    : Height(h), Width(w), data(h * w, value)
+  {
+    if (!h || !w)
+      Height = Width = 0;
+  }
 
   Image(const Image<T> &other) = default;
   Image(Image<T> &&other) = default;
@@ -25,8 +29,12 @@ public:
 
 
   void Resize(size_t h, size_t w, const T &value = T()) {
-    Height = h;
-    Width = w;
+    if (!h || !w)
+      Height = Width = 0;
+    else {
+      Height = h;
+      Width = w;
+    }
     data.resize(Height * Width, value);
   }
 
