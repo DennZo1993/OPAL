@@ -1,7 +1,6 @@
 set (SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../lodepng/lodepng.cpp
              ${CMAKE_CURRENT_SOURCE_DIR}/../RGBAPixel.cpp
              AnalyzeHeader.cpp
-             ImageReader.cpp
              PngImageWriter.cpp)
 
 add_library(libImageIO STATIC ${SOURCES})

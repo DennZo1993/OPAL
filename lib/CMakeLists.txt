@@ -1,4 +1,5 @@
-set (SOURCES RGBAPixel.cpp
+set (SOURCES util.cpp
+             RGBAPixel.cpp
              OPAL.cpp)
 
 add_subdirectory(ImageIO)

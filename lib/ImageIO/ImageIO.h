@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.h"
+
 #include "AnalyzeImageReader.h"
 #include "PngImageReader.h"
 
@@ -10,7 +12,7 @@ namespace ImageIO {
 
 template <class T>
 Image<T> ReadImage(const std::string &fileName) {
-  auto fileNameParts = SplitFileName(fileName);
+  auto fileNameParts = SplitStringByLast(fileName, '.');
 
   ImageReader<T> *reader = nullptr;
 
@@ -33,7 +35,7 @@ Image<T> ReadImage(const std::string &fileName) {
 
 template <class T>
 void WriteImage(const Image<T> &image, const std::string &fileName) {
-  auto fileNameParts = SplitFileName(fileName);
+  auto fileNameParts = SplitStringByLast(fileName, '.');
 
   ImageWriter<T> *writer = nullptr;
 

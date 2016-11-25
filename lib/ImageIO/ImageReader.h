@@ -27,7 +27,7 @@ protected:
 };
 
 
-std::pair<std::string, std::string>
-SplitFileName(const std::string &fileName);
+//std::pair<std::string, std::string>
+//SplitFileName(const std::string &fileName);
 
 } // namespace ImageIO

@@ -2,6 +2,7 @@
 
 #include "AnalyzeHeader.h"
 #include "ImageReader.h"
+#include "util.h"
 
 #include <cstdio>
 #include <stdexcept>
@@ -78,7 +79,7 @@ private:
 
 
   std::string GetHeaderFileName() const {
-    auto p = SplitFileName(SuperClass::fileName);
+    auto p = SplitStringByLast(SuperClass::fileName, '.');
     return p.first + ".hdr";
   }
 
