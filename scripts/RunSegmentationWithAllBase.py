@@ -75,6 +75,29 @@ def run_segmentation(config, images, segmentations, target_idx):
 
 def results_stats():
   import statistics
+
+  OTHER_RESULTS = {
+    2:  [0.93, 0.94],
+    3:  [0.74, 0.72],
+    4:  [0.84, 0.73],
+    5:  [0.03, 0.0 ],
+    7:  [0.67, 0.70],
+    8:  [0.63, 0.61],
+    10: [0.83, 0.83],
+    14: [0.09, 0.0 ],
+    15: [0.0,  0.20],
+    16: [0.87, 0.89],
+    17: [0.60, 0.62],
+    24: [0.27, 0.10],
+    41: [0.73, 0.78],
+    42: [0.75, 0.73],
+    43: [0.83, 0.78],
+    46: [0.68, 0.59],
+    47: [0.63, 0.60],
+    49: [0.84, 0.81],
+    53: [0.58, 0.50],
+  }
+
   mean_running_time = statistics.mean(global_times)
   mean_scores = {}
   median_scores = {}
@@ -88,15 +111,28 @@ def results_stats():
     mean_scores[label] = statistics.mean(score_list)
     median_scores[label] = statistics.median(score_list)
 
-  print('{:<10}{:<10}{:<10}{:<10}{:<10}'.format('Label', 'Min', 'Max', 'Mean', 'Median'))
+  print('{:<13}{:<13}{:<13}{:<13}{:<13}{:<13}{:<13}'.format(
+          'Label', 'Min', 'Max', 'Mean', 'Median', 'vs. KeyPoints', 'vs. SyN')
+       )
   for label in global_scores:
     if label < 2:
       continue
-    print('{:<10}{:<10.5}{:<10.5}{:<10.5}{:<10.5}'.format(label,
-                                                          min_scores[label],
-                                                          max_scores[label],
-                                                          mean_scores[label],
-                                                          median_scores[label]))
+    if label in OTHER_RESULTS:
+      vs_key_points = mean_scores[label] - OTHER_RESULTS[label][0]
+      vs_syn = mean_scores[label] - OTHER_RESULTS[label][1]
+    else:
+      vs_key_points = 0.0
+      vs_syn = 0.0
+
+    print('{:<13}{:<13.5}{:<13.5}{:<13.5}{:<13.5}{:<13.5}{:<13.5}'.format(
+            label,
+            min_scores[label],
+            max_scores[label],
+            mean_scores[label],
+            median_scores[label],
+            vs_key_points,
+            vs_syn)
+         )
 
   print(mean_running_time)
 
@@ -118,10 +154,10 @@ def main():
 
   opal_settings = {
     'initWindowRadius': '10',
-    'patchRadius': 6,
+    'patchRadius': 12,
     'intermediateSaving': 'false',
     'intermediateSavingPath': '',
-    'maxIterations': '50',
+    'maxIterations': '30',
   }
 
   rmtree(RESULTS_ROOT_DIR, ignore_errors=True)
