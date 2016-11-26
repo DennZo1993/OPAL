@@ -1,10 +1,14 @@
 #pragma once
 
+#include "util.h"
+
 #include <string>
+#include <map>
+
 
 // A lightweight class containing various OPAL parameters.
 struct OPALSettings {
-public:
+private:
   OPALSettings(size_t _initWindowRadius
              , size_t _patchRadius
              , bool _intermediateSaving
@@ -21,6 +25,29 @@ public:
   {}
 
 
+  OPALSettings(const std::map<std::string, std::string> &sets)
+    : initWindowRadius(std::stoul(sets.at("initWindowRadius")))
+    , patchRadius(std::stoul(sets.at("patchRadius")))
+    , intermediateSaving(sets.at("intermediateSaving") == "true")
+    , intermediateSavingPath(sets.at("intermediateSavingPath"))
+    , maxIterations(std::stoul(sets.at("maxIterations")))
+  {
+    initWindowSide = 2 * initWindowRadius + 1;
+    patchSide = 2 * patchRadius + 1;
+  }
+
+
+  static std::map<std::string, std::string> GetDefaultSetsMap() {
+    return {
+      { "initWindowRadius",       "10"    },
+      { "patchRadius",            "3"     },
+      { "intermediateSaving",     "false" },
+      { "intermediateSavingPath", ""      },
+      { "maxIterations",          "30"    }
+    };
+  }
+
+public:
   // Radius of initialization window. Window is square,
   // each side (2 * initWindowRadius + 1) pixels.
   size_t initWindowRadius;
@@ -37,13 +64,34 @@ public:
 
   size_t maxIterations;
 
+
   // Default values for all settings.
   static OPALSettings GetDefaults() {
-    return OPALSettings(10    /* initWindowRadius       */
-                      , 10     /* patchRadius            */
-                      , false /* intermediateSaving     */
-                      , ""    /* intermediateSavingPath */
-                      , 30
-                       );
+    return OPALSettings(GetDefaultSetsMap());
+  }
+
+
+  static OPALSettings ReadFromFile(const std::string &fileName) {
+    std::map<std::string, std::string> settings = GetDefaultSetsMap();
+
+    std::ifstream ifs(fileName);
+    std::string line;
+  
+    while (ifs >> line) {
+      auto keyValue = SplitStringByLast(line, '=');
+      settings[keyValue.first] = keyValue.second;
+    }
+
+    return OPALSettings(settings);
+  }
+
+
+  friend std::ostream & operator<<(std::ostream &os, const OPALSettings &sets) {
+    os         << "initWindowRadius       = " << sets.initWindowRadius
+       << '\n' << "patchRadius            = " << sets.patchRadius
+       << '\n' << "intermediateSaving     = " << sets.intermediateSaving
+       << '\n' << "intermediateSavingPath = " << sets.intermediateSavingPath
+       << '\n' << "maxIterations          = " << sets.maxIterations;
+    return os;
   }
 };
