@@ -87,11 +87,13 @@ public:
 
 
   friend std::ostream & operator<<(std::ostream &os, const OPALSettings &sets) {
-    os         << "initWindowRadius       = " << sets.initWindowRadius
+    os << "OPAL settings:"
+       << '\n' << "initWindowRadius       = " << sets.initWindowRadius
        << '\n' << "patchRadius            = " << sets.patchRadius
        << '\n' << "intermediateSaving     = " << sets.intermediateSaving
        << '\n' << "intermediateSavingPath = " << sets.intermediateSavingPath
-       << '\n' << "maxIterations          = " << sets.maxIterations;
+       << '\n' << "maxIterations          = " << sets.maxIterations
+       << std::endl;
     return os;
   }
 };

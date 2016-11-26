@@ -2,38 +2,61 @@
 #include "ImageIO.h"
 #include "SegmentationColorsConverter.h"
 #include "SegmentationAccuracyEstimator.h"
+
 #include <iostream>
+#include <ctime>
+
 
 int main(int argc, char **argv) {
-  if (argc < 5)
-    return 0;
+  OPALSettings settings = OPALSettings::ReadFromFile(argv[1]);
+
+  std::cout << settings << std::endl;
+
+  std::cout << "Database:" << std::endl;
 
   OPAL::DatabaseType db;
-  db.Add(argv[1], argv[2]);
-  db.Add(argv[3], argv[4]);
+  for (int i = 2; i < argc - 2; i += 2) {
+    db.Add(argv[i], argv[i+1]);
+    std::cout << argv[i] << "   " << argv[i+1] << std::endl;
+  }
 
-  OPAL opal(OPALSettings::GetDefaults(), db);
+  std::string resultDir(argv[argc-1]);
+
+  std::cout << "\nresult dir: " << resultDir << std::endl;
+  std::cout << "gt: " << argv[3] << std::endl;
+
+  OPAL opal(settings, db);
+
+  auto clocksBefore = clock();
+
   opal.Run();
 
-  auto seg = opal.GetOutput();
+  auto clocksAfter = clock();
+  double timeConsumed = double(clocksAfter - clocksBefore) / double(CLOCKS_PER_SEC);
 
+  auto seg = opal.GetOutput();
+  auto groundTruth = ImageIO::ReadImage<OPAL::SegmentationPixelType>(argv[3]);
+  
   ImageIO::SegmentationColorsConverter<OPAL::SegmentationPixelType> converter;
 
-  auto rgb = converter.ConvertToRGB(seg);
+  auto rgbResult = converter.ConvertToRGB(seg);
+  auto rgbGT = converter.ConvertToRGB(groundTruth);
 
-  ImageIO::WriteImage(rgb, argv[5]);
-
-  auto groundTruth = ImageIO::ReadImage<OPAL::SegmentationPixelType>(argv[6]);
+  ImageIO::WriteImage(rgbResult, resultDir + "/result.png");
+  ImageIO::WriteImage(rgbGT, resultDir + "/ground_truth.png");
   
   SegmentationAccuracyEstimator<OPAL::SegmentationPixelType> estimator;
   estimator.Estimate(groundTruth, seg);
 
   auto diceMap = estimator.GetDiceScoreMap();
 
+  std::cout << "\nDice scores:" << std::endl;
   for (const auto &l : diceMap) {
     std::cout.width(3);
     std::cout << l.first << '\t' << l.second << std::endl;
   }
+
+  std::cout << "\nOPAL running time: " << timeConsumed << std::endl;
 
   return 0;
 }
