@@ -63,7 +63,6 @@ def main():
   print('Running OPAL...')
   for i in range(len(images)):
     run_segmentation(opal_config, images, segmentations, i)
-    print('Image {i} done'.format(i=i))
 
   results = {}
   results['times'] = global_times

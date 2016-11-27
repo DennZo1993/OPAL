@@ -1,19 +1,13 @@
 #pragma once
 
 #include "../RGBAPixel.h"
-#include <type_traits>
 #include <map>
+#include <stdexcept>
 
 
 namespace ImageIO {
 
-template <class T, class Enable = void>
-class SegmentationColorsConverter;
-
-template <class T>
-class SegmentationColorsConverter<
-        T, typename std::enable_if<std::is_integral<T>::value>::type>
-{
+class SegmentationColorsConverter {
 public:
   SegmentationColorsConverter() {
     ColorsMap[0] = RGBAPixel(0, 0, 0);
@@ -139,11 +133,48 @@ public:
     ColorsMap[120] = RGBAPixel(1, 1, 1);
   }
 
-  Image<RGBAPixel> ConvertToRGB(const Image<T> &image) {
+  template <class SegmentationPixelType>
+  Image<RGBAPixel> ConvertToRGB(const Image<SegmentationPixelType> &image) {
     Image<RGBAPixel> result(image.getHeight(), image.getWidth());
     for (size_t i = 0; i < image.getSize(); ++i) {
       result[i] = ColorsMap.at(image[i]);
     }
+    return result;
+  }
+
+  template <class ImagePixelType, class SegmentationPixelType>
+  Image<RGBAPixel> ConvertToRGB(const Image<ImagePixelType> &image,
+                                const Image<SegmentationPixelType> &seg,
+                                bool contoured = true) {
+    if (image.getWidth() != seg.getWidth() ||
+        image.getHeight() != seg.getHeight())
+      throw std::invalid_argument("Image and segmentation size mismatch!");
+
+    Image<RGBAPixel> result(image.getHeight(), image.getWidth());
+    for (size_t i = 1; i + 1 < image.getHeight(); ++i) {
+      for (size_t j = 1; j + 1 < image.getWidth(); ++j) {
+        if (!seg(i, j)) {
+          // No label here, just draw image pixel.
+          result(i, j) = RGBAPixel(image(i, j));
+        } else {
+          // Segmentation label here.
+          if (!contoured) {
+            // Not contoured mode, just draw label.
+            result(i, j) = ColorsMap.at(seg(i, j));
+          } else {
+            auto currentLabel = seg(i, j);
+            bool insideStructure =
+              seg(i-1, j) == currentLabel &&
+              seg(i+1, j) == currentLabel &&
+              seg(i, j-1) == currentLabel &&
+              seg(i, j+1) == currentLabel;
+
+            result(i, j) = insideStructure ? RGBAPixel(image(i, j))
+                                            : ColorsMap.at(seg(i, j));
+          }
+        }
+      } // for (j)
+    } // for (i)
     return result;
   }
 

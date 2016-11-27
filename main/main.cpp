@@ -37,10 +37,10 @@ int main(int argc, char **argv) {
   auto seg = opal.GetOutput();
   auto groundTruth = ImageIO::ReadImage<OPAL::SegmentationPixelType>(argv[3]);
   
-  ImageIO::SegmentationColorsConverter<OPAL::SegmentationPixelType> converter;
+  ImageIO::SegmentationColorsConverter converter;
 
-  auto rgbResult = converter.ConvertToRGB(seg);
-  auto rgbGT = converter.ConvertToRGB(groundTruth);
+  auto rgbResult = converter.ConvertToRGB(db.getImage(0), seg);
+  auto rgbGT = converter.ConvertToRGB(db.getImage(0), groundTruth);
 
   ImageIO::WriteImage(rgbResult, resultDir + "/result.png");
   ImageIO::WriteImage(rgbGT, resultDir + "/ground_truth.png");
