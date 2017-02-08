@@ -15,7 +15,7 @@ struct HeaderKey {
   int16_t SessionError;
   char    Regular;
   char    HKeyUn0;
-} __attribute__((packed)); // 40 bytes.
+}; // 40 bytes.
 
 
 struct ImageDimensions {
@@ -33,7 +33,7 @@ struct ImageDimensions {
   float   Verified;
   int32_t GlobalMax;
   int32_t GlobalMin;
-} __attribute__((packed)); // 108 bytes.
+}; // 108 bytes.
 
 
 struct DataHistory {
@@ -55,7 +55,7 @@ struct DataHistory {
   int32_t OMin;
   int32_t SMax;
   int32_t SMin;
-} __attribute__((packed)); // 200 bytes.
+}; // 200 bytes.
 
 
 class AnalyzeFileHeader {
@@ -64,7 +64,7 @@ public:
     HeaderKey       key;
     ImageDimensions dims;
     DataHistory     hist;
-  } __attribute__((packed)); // 348 bytes.
+  }; // 348 bytes.
 
   AnalyzeFileHeader();
   AnalyzeFileHeader(FILE *f);
@@ -79,9 +79,10 @@ private:
   void PrintKey(std::ostream &os) const;
   void PrintImageDimensions(std::ostream &os) const;
   void PrintDataHistory(std::ostream &os) const;
-  static const char* DecodeOrientation(char orient);
 
+  static const char *DecodeOrientation(char orient);
 
+private:
   Data data;
 };
 

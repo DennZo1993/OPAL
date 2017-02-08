@@ -1,8 +1,21 @@
 #include "AnalyzeHeader.h"
 
+
+template <class ToCheck,
+          std::size_t ExpectedSize, std::size_t RealSize = sizeof(ToCheck)>
+static void CheckSize() {
+  static_assert(ExpectedSize == RealSize, "CheckSize failed: size mismatch!");
+}
+
+
 namespace Analyze {
 
 AnalyzeFileHeader::AnalyzeFileHeader() {
+  CheckSize<HeaderKey, 40>();
+  CheckSize<ImageDimensions, 108>();
+  CheckSize<DataHistory, 200>();
+  CheckSize<Data, 348>();
+
   std::memset(&data, 0, sizeof(Data));
 }
 
