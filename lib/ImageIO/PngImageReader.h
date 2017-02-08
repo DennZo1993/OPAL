@@ -8,11 +8,10 @@
 #include <iostream>
 
 
-namespace ImageIO {
+namespace {
 
 template <class PixelType>
-__attribute__((unused)) static void
-CastRGBPixels(const Image<RGBAPixel> &rgb, Image<PixelType> &img) {
+void CastRGBPixels(const Image<RGBAPixel> &rgb, Image<PixelType> &img) {
   img.Resize(rgb.getHeight(), rgb.getWidth());
 
   for (size_t i = 0; i < rgb.getSize(); ++i) {
@@ -27,6 +26,10 @@ void CastRGBPixels<RGBAPixel>(const Image<RGBAPixel> &rgb,
   img = rgb;
 }
 
+} // namespace
+
+
+namespace ImageIO {
 
 template <class T>
 class PngImageReader : public ImageReader<T> {
