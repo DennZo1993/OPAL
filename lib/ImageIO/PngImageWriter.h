@@ -45,4 +45,6 @@ protected:
 template<>
 void PngImageWriter<RGBAPixel>::ConvertToRGB(const Image<RGBAPixel> &image);
 
+template class PngImageWriter<RGBAPixel>;
+
 } // namespace ImageIO
