@@ -33,13 +33,13 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - llvm-toolchain-precise-3.8
             - george-edison55-precise-backports
           packages:
-            - clang-3.7
+            - clang-3.8
             - cmake
             - cmake-data
-      env: C_COMPILER=clang-3.7 CXX_COMPILER=clang++-3.7 GTEST_COLOR=1
+      env: C_COMPILER=clang-3.8 CXX_COMPILER=clang++-3.8 GTEST_COLOR=1
 
 install:
   - |
