@@ -55,13 +55,3 @@ TEST(ImageTest, Constructors9) {
   ASSERT_TRUE(ImageHasSize(m9, 5, 10));
   ASSERT_TRUE(ImageIsFilledWith(m9, 7.0));
 }
-
-TEST(ImageTest, ConstructorsNegative1) {
-  ASSERT_THROW(Image<int> m10(-1, 10, 5),
-               std::bad_alloc);
-}
-
-TEST(ImageTest, ConstructorsNegative2) {
-  ASSERT_THROW(Image<int> m10(5, -1232, 5),
-               std::bad_alloc);
-}

@@ -11,6 +11,9 @@
 namespace {
 
 template <class PixelType>
+#if !_MSC_VER
+__attribute__((unused))
+#endif
 void CastRGBPixels(const Image<RGBAPixel> &rgb, Image<PixelType> &img) {
   img.Resize(rgb.getHeight(), rgb.getWidth());
 
