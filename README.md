@@ -1,7 +1,5 @@
 # OPAL
-| Build | Coverage |
-|---|---|
-| [![Build Status](https://travis-ci.org/DennZo1993/OPAL.svg?branch=master)](https://travis-ci.org/DennZo1993/OPAL) | [![Coverage Status](https://coveralls.io/repos/github/DennZo1993/OPAL/badge.svg?branch=master)](https://coveralls.io/github/DennZo1993/OPAL?branch=master) |
+[![Build Status](https://travis-ci.org/DennZo1993/OPAL.svg?branch=master)](https://travis-ci.org/DennZo1993/OPAL) [![Build status](https://ci.appveyor.com/api/projects/status/a3vbuu8mwv80ci0p?svg=true)](https://ci.appveyor.com/project/DennZo1993/opal) [![Coverage Status](https://coveralls.io/repos/github/DennZo1993/OPAL/badge.svg?branch=master)](https://coveralls.io/github/DennZo1993/OPAL?branch=master)
 
 **University project**
 
