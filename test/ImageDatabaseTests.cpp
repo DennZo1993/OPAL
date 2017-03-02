@@ -63,12 +63,3 @@ TEST(ImageDatabaseTests, TestLoadPNGImageAndPixels) {
   }
 }
 
-
-TEST(ImageDatabaseTests, TestAccessFail) {
-  ImageDatabase<double, int> db;
-  db.Add("test_data/pictures/alley_1_frame_0001.png",
-         "test_data/pictures/alley_1_frame_0002.png");
-
-  ASSERT_THROW(db.getImage(1), std::out_of_range);
-  ASSERT_THROW(db.getSegmentation(2), std::out_of_range);
-}
