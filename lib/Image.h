@@ -143,10 +143,9 @@ public:
   }
 
 
-  // Throws std::invalid_argument.
   Image<T> &operator+=(const Image<T> &other) {
-    if (Height != other.getHeight() || Width != other.getWidth())
-      throw std::invalid_argument("Image size mismatch in += operation!");
+    assert(Height == other.getHeight() && "Height mismatch!");
+    assert(Width == other.getWidth() && "Width mismatch!");
 
     for (size_t i = 0; i < data.size(); ++i)
       data[i] += other[i];
@@ -155,10 +154,9 @@ public:
   }
 
 
-  // Throws std::invalid_argument.
   Image<T> &operator-=(const Image<T> &other) {
-    if (Height != other.getHeight() || Width != other.getWidth())
-      throw std::invalid_argument("Image size mismatch in -= operation!");
+    assert(Height == other.getHeight() && "Height mismatch!");
+    assert(Width == other.getWidth() && "Width mismatch!");
 
     for (size_t i = 0; i < data.size(); ++i)
       data[i] -= other[i];
@@ -167,14 +165,12 @@ public:
   }
 
 
-  // Throws std::invalid_argument.
   friend Image<T> operator+(Image<T> lhs, const Image<T> &rhs) {
     lhs += rhs;
     return lhs;
   }
 
 
-  // Throws std::invalid_argument.
   friend Image<T> operator-(Image<T> lhs, const Image<T> &rhs) {
     lhs -= rhs;
     return lhs;
@@ -188,27 +184,18 @@ protected:
 
 
 public:
-  // Throws std::out_of_range.
   auto operator()(size_t i, size_t j) -> decltype(data[0]) {
-    if (i >= Height)
-      throw std::out_of_range("i (" + std::to_string(i) + ") >= height (" +
-                              std::to_string(Height) + ")");
-    if (j >= Width)
-      throw std::out_of_range("j (" + std::to_string(j) + ") >= width (" +
-                              std::to_string(Width) + ")");
+    assert(i < Height && "i index out of range!");
+    assert(j < Width && "i index out of range!");
+
     return data[i * Width + j];
   }
 
 
   auto operator()(size_t i, size_t j) const -> decltype(data[0]) {
-    if (i >= Height)
-      throw std::out_of_range("i (" + std::to_string(i) +
-                              ") is greater than height (" +
-                              std::to_string(Height) + ")");
-    if (j >= Width)
-      throw std::out_of_range("j (" + std::to_string(j) +
-                              ") is greater than width (" +
-                              std::to_string(Width) + ")");
+    assert(i < Height && "i index out of range!");
+    assert(j < Width && "i index out of range!");
+
     return data[i * Width + j];
   }
 

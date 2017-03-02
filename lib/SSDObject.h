@@ -36,9 +36,17 @@ public:
     , patchRadius(radius)
     , patchSide(2 * radius + 1)
   {
-    if (PatchInsideImage(srcImage, srcI, srcJ, patchRadius) &&
-        PatchInsideImage(dstImage, dstI, dstJ, patchRadius))
-      CalculateValue();
+    // If we try to construct a new SSDObject, we must be sure we pass
+    // correct arguments to calculate it.
+    assert(PatchInsideImage(srcImage, srcI, srcJ, patchRadius) &&
+           "Patch is outside the source image!");
+    assert(PatchInsideImage(dstImage, dstI, dstJ, patchRadius) &&
+           "Patch is outside the destination image!");
+
+    CalculateValue();
+
+    // After construction we must have a valid SSDObject.
+    assert(calculated && "SSD is not calculated after construction!");
   }
 
   SSDObject(const SSDObject &) = default;
@@ -48,9 +56,10 @@ public:
   SSDObject& operator=(const SSDObject &) = default;
   SSDObject& operator=(SSDObject &&) = default;
 
+public:
   T GetValue() const {
-    if (!calculated)
-      throw std::invalid_argument("SSDObject cannot be calculated!");
+    assert(calculated && "Trying to get value of invalid SSDObject!");
+
     return value;
   }
 
@@ -68,9 +77,10 @@ public:
 
 
   bool ShiftRight() {
-    if (calculated &&
-        PatchInsideImage(srcImage, srcI, srcJ + 1, patchRadius) &&
-        PatchInsideImage(dstImage, dstI, dstJ + 1, patchRadius)) {
+    assert(calculated && "Shifting invalid SSDObject!");
+
+    if (srcJ + 1 + patchRadius < srcImage->getWidth() &&
+        dstJ + 1 + patchRadius < dstImage->getWidth()) {
       for (size_t di = 0; di < patchSide; ++di) {
         T diff1 = (*srcImage)(srcI + di - patchRadius, srcJ + patchRadius + 1) -
                   (*dstImage)(dstI + di - patchRadius, dstJ + patchRadius + 1);
@@ -83,16 +93,16 @@ public:
       ++dstJ;
     } else {
       calculated = false;
-      value = -1000;
     }
+
     return calculated;
   }
 
 
   bool ShiftLeft() {
-    if (calculated &&
-        PatchInsideImage(srcImage, srcI, srcJ - 1, patchRadius) &&
-        PatchInsideImage(dstImage, dstI, dstJ - 1, patchRadius)) {
+    assert(calculated && "Shifting invalid SSDObject!");
+
+    if (srcJ > patchRadius && dstJ > patchRadius) {
       for (size_t di = 0; di < patchSide; ++di) {
         T diff1 = (*srcImage)(srcI + di - patchRadius, srcJ - patchRadius - 1) -
                   (*dstImage)(dstI + di - patchRadius, dstJ - patchRadius - 1);
@@ -105,16 +115,16 @@ public:
       --dstJ;
     } else {
       calculated = false;
-      value = -1000;
     }
+
     return calculated;
   }
 
 
   bool ShiftUp() {
-    if (calculated &&
-        PatchInsideImage(srcImage, srcI - 1, srcJ, patchRadius) &&
-        PatchInsideImage(dstImage, dstI - 1, dstJ, patchRadius)) {
+    assert(calculated && "Shifting invalid SSDObject!");
+
+    if (srcI > patchRadius && dstI > patchRadius) {
       for (size_t dj = 0; dj < patchSide; ++dj) {
         T diff1 = (*srcImage)(srcI - patchRadius - 1, srcJ + dj - patchRadius) -
                   (*dstImage)(dstI - patchRadius - 1, dstJ + dj - patchRadius);
@@ -127,16 +137,17 @@ public:
       --dstI;
     } else {
       calculated = false;
-      value = -1000;
     }
+
     return calculated;
   }
 
 
   bool ShiftDown() {
-    if (calculated &&
-        PatchInsideImage(srcImage, srcI + 1, srcJ, patchRadius) &&
-        PatchInsideImage(dstImage, dstI + 1, dstJ, patchRadius)) {
+    assert(calculated && "Shifting invalid SSDObject!");
+
+    if (srcI + 1 + patchRadius < srcImage->getHeight() &&
+        dstI + 1 + patchRadius < dstImage->getHeight()) {
       for (size_t dj = 0; dj < patchSide; ++dj) {
         T diff1 = (*srcImage)(srcI + patchRadius + 1, srcJ + dj - patchRadius) -
                   (*dstImage)(dstI + patchRadius + 1, dstJ + dj - patchRadius);
@@ -149,8 +160,8 @@ public:
       ++dstI;
     } else {
       calculated = false;
-      value = -1000;
     }
+
     return calculated;
   }
 
@@ -201,12 +212,14 @@ private:
 
   void CalculateValue() {
     value = 0;
+
     for (size_t di = 0; di < patchSide; ++di)
       for (size_t dj = 0; dj < patchSide; ++dj) {
         T diff = (*srcImage)(srcI + di - patchRadius, srcJ + dj - patchRadius) -
                  (*dstImage)(dstI + di - patchRadius, dstJ + dj - patchRadius);
         value += diff * diff;
       }
+
     calculated = true;
   }
 

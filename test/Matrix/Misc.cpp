@@ -32,11 +32,3 @@ TEST(ImageMiscTest, TestFillNonEmpty) {
   ASSERT_TRUE(ImageIsFilledWith(m1, 10));
 }
 
-TEST(ImageMiscTest, TestAccessFail1) {
-  Image<int> m1(5, 10, 3);
-
-  ASSERT_THROW(m1(6, 0), std::out_of_range);
-  ASSERT_THROW(m1(5, 9), std::out_of_range);
-  ASSERT_THROW(m1(-1, 0), std::out_of_range);
-}
-

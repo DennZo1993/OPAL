@@ -83,16 +83,16 @@ public:
 
   // Throws std::out_of_range.
   const ImageType &getImage(size_t i) const {
-    if (i >= images.size())
-     throw std::out_of_range("Index out of range!");
+    assert(i < images.size() && "Image index is out of range!");
+
     return images[i];
   }
 
 
   // Throws std::out_of_range.
   const SegmentationType &getSegmentation(size_t i) const {
-    if(i >= segmentations.size())
-      throw std::out_of_range("Index out of range!");
+    assert(i < segmentations.size() && "Segmentation index is out of range!");
+
     return segmentations[i];
   }
 
