@@ -17,17 +17,17 @@ OPAL::OPAL(const OPALSettings &settings, const DatabaseType &database)
   : Sets(settings)
   , Database(database)
 {
-  if (Database.isEmpty())
+  if (Database.IsEmpty())
     throw std::logic_error("Image database is empty!");
   // The first pair in the DB is image to be segmented.
   // We need more images to proceed.
-  if (Database.getImageCount() == 1)
+  if (Database.GetImageCount() == 1)
     throw std::logic_error("Image database contains only 1 pair!");
 
-  ImageHeight = Database.getImageHeight();
-  ImageWidth = Database.getImageWidth();
+  ImageHeight = Database.GetImageHeight();
+  ImageWidth = Database.GetImageWidth();
 
-  InputImage = Database.getImage(0);
+  InputImage = Database.GetImage(0);
   OutputSegmentation.Resize(ImageHeight, ImageWidth);
 
   // Allocate memory, but don't fill.
@@ -45,7 +45,7 @@ OPAL::OPAL(const OPALSettings &settings, const DatabaseType &database)
 void OPAL::ConstrainedInitialization() {
   int distLowerBound = (-1) * static_cast<int>(Sets.initWindowRadius);
   int distUpperBound = static_cast<int>(Sets.initWindowRadius);
-  std::uniform_int_distribution<int> distT(1, Database.getImageCount()-1);
+  std::uniform_int_distribution<int> distT(1, Database.GetImageCount()-1);
   std::uniform_int_distribution<int> distX(distLowerBound, distUpperBound);
 
   // (i, j) is mapped to (i+offsetY, j+offsetX) at Database[t].
@@ -186,7 +186,7 @@ int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
 void OPAL::BuildSegmentation() {
   for (size_t i = Sets.patchRadius; i + Sets.patchRadius < ImageHeight; ++i)
     for (size_t j = Sets.patchRadius; j + Sets.patchRadius < ImageWidth; ++j) {
-      const auto &curDst = Database.getSegmentation(FieldT(i, j));
+      const auto &curDst = Database.GetSegmentation(FieldT(i, j));
       const auto OffsetX = FieldX(i, j);
       const auto OffsetY = FieldY(i, j);
 
@@ -215,7 +215,7 @@ void OPAL::SaveCurrentFields(const std::string &fileName) const {
 
 
 OPAL::SSDType OPAL::SSDAt(size_t i, size_t j) const {
-  const auto &curDst = Database.getImage(FieldT(i, j));
+  const auto &curDst = Database.GetImage(FieldT(i, j));
   auto curX = j + FieldX(i, j);
   auto curY = i + FieldY(i, j);
 

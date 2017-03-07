@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
   
   ImageIO::SegmentationColorsConverter converter;
 
-  auto rgbResult = converter.ConvertToRGB(db.getImage(0), seg);
-  auto rgbGT = converter.ConvertToRGB(db.getImage(0), groundTruth);
+  auto rgbResult = converter.ConvertToRGB(db.GetImage(0), seg);
+  auto rgbGT = converter.ConvertToRGB(db.GetImage(0), groundTruth);
 
   ImageIO::WriteImage(rgbResult, resultDir + "/result.png");
   ImageIO::WriteImage(rgbGT, resultDir + "/ground_truth.png");

@@ -3,6 +3,7 @@ set (SOURCES util.cpp
              OPAL.cpp)
 
 add_subdirectory(ImageIO)
+add_subdirectory(json11)
 
 add_library(libOPAL STATIC ${SOURCES})
 

@@ -71,6 +71,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage") # enabl
 # Testing project
 SET(TEST_SOURCES main.cpp
                  Common.cpp
+
+                 UtilTests.cpp
+
                  Matrix/Constructors.cpp
                  Matrix/Allocation.cpp
                  #Matrix/Read.cpp

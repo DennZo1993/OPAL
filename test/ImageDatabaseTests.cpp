@@ -7,9 +7,9 @@ TEST(ImageDatabaseTests, TestLoadPNGImage) {
   db.Add("test_data/pictures/alley_1_frame_0001.png",
          "test_data/pictures/alley_1_frame_0002.png");
 
-  ASSERT_EQ(1, db.getImageCount());
-  const Image<double> &img = db.getImage(0);
-  const Image<int> &seg = db.getSegmentation(0);
+  ASSERT_EQ(1, db.GetImageCount());
+  const Image<double> &img = db.GetImage(0);
+  const Image<int> &seg = db.GetSegmentation(0);
 
   ASSERT_TRUE(ImageHasSize(img, 436, 1024));
   ASSERT_TRUE(ImageHasSize(seg, 436, 1024));
@@ -39,9 +39,9 @@ TEST(ImageDatabaseTests, TestLoadPNGImageAndPixels) {
   db.Add("test_data/pictures/small_4x5_color.png",
          "test_data/pictures/small_4x5_color.png");
 
-  ASSERT_EQ(1, db.getImageCount());
-  const Image<double> &img = db.getImage(0);
-  const Image<int> &seg = db.getSegmentation(0);
+  ASSERT_EQ(1, db.GetImageCount());
+  const Image<double> &img = db.GetImage(0);
+  const Image<int> &seg = db.GetSegmentation(0);
 
   ASSERT_TRUE(ImageHasSize(img, 4, 5));
   ASSERT_TRUE(ImageHasSize(seg, 4, 5));

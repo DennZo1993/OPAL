@@ -15,3 +15,4 @@ Near Real Time and Accurate Label Fusion. MICCAI 2014, Sep 2014, United States. 
 **Third-party libraries used**
 - [LodePNG](https://github.com/lvandeve/lodepng)
 - [flow_code](http://sintel.is.tue.mpg.de/downloads)
+- [json11](https://github.com/dropbox/json11)
