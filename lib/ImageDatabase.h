@@ -3,6 +3,7 @@
 #include "Image.h"
 #include "ImageIO/ImageIO.h"
 #include "util.h" // ReadFileToString
+#include "json11/json11.hpp"
 
 #include <stdexcept>
 #include <cassert>
@@ -17,8 +18,19 @@ class ImageDatabase {
 public:
   using ImagePixelType        = I;
   using SegmentationPixelType = S;
-  using ImageType             = Image<ImagePixelType>;
-  using SegmentationType      = Image<SegmentationPixelType>;
+
+  using ImageType        = Image<ImagePixelType>;
+  using SegmentationType = Image<SegmentationPixelType>;
+
+  template<class T>
+  struct FileImage {
+    std::string name;
+    Image<T> image;
+  };
+
+  using FileImageType        = FileImage<ImagePixelType>;
+  using FileSegmentationType = FileImage<SegmentationPixelType>;
+
 
   ImageDatabase() = default;
 
@@ -48,21 +60,33 @@ public:
   // Getters.
 
   // Get images.
-  const ImageType        & GetImage(size_t i)        const;
-  const SegmentationType & GetSegmentation(size_t i) const;
+  inline const ImageType        & GetImage(size_t i)        const;
+  inline const SegmentationType & GetSegmentation(size_t i) const;
 
-  size_t GetImageCount() const;
-  inline bool IsEmpty() const;
+  inline size_t GetImageCount() const;
+  inline bool   IsEmpty()       const;
 
   // Get image dimensions.
   size_t GetImageHeight() const { return imageHeight; }
   size_t GetImageWidth()  const { return imageWidth;  }
 
 private:
-  std::vector<ImageType>        images;
-  std::vector<SegmentationType> segmentations;
+  // Parse 'images' or 'segmentation' section. Section is required.
+  // files and folder are cleared first.
+  //
+  // Throws std::runtime_error if section is not present in the config.
+  void ParseConfigSection(const json11::Json &config,
+                          const std::string &section, std::string &folder,
+                          std::vector<std::string> &files);
+
+private:
+  std::vector<FileImageType>        images;
+  std::vector<FileSegmentationType> segmentations;
+
   size_t imageHeight;
   size_t imageWidth;
+
+  std::string dbName;
 };
 
 
@@ -97,8 +121,78 @@ void ImageDatabase<I, S>::Add(const std::string &imageFileName,
         "Size of new image/segmentation doesn't suit the database!");
   }
 
-  images.push_back(imgMat);
-  segmentations.push_back(segMat);
+  images.push_back({imageFileName, imgMat});
+  segmentations.push_back({segFileName, segMat});
+}
+
+
+template<class I, class S>
+void ImageDatabase<I, S>::ReadFromConfig(const std::string &fileName)
+{
+  std::string config = ReadFileToString(fileName);
+  std::string parseError;
+  auto jsonConfig = json11::Json::parse(config, parseError);
+
+  if (jsonConfig.is_null())
+    throw std::runtime_error("Error while parsing JSON from " + fileName +
+                             " - " + parseError);
+
+  // Retrieve info from config.
+
+  // Database name (optional).
+  auto name = jsonConfig["name"];
+  if (!name.is_null())
+    dbName = name.string_value();
+
+  std::string imagesFolder;
+  std::vector<std::string> imagesFiles;
+  ParseConfigSection(jsonConfig, "images", imagesFolder, imagesFiles);
+
+  std::string segFolder;
+  std::vector<std::string> segFiles;
+  ParseConfigSection(jsonConfig, "segmentations", segFolder, segFiles);
+}
+
+
+template<class I, class S>
+void ImageDatabase<I, S>::ParseConfigSection(const json11::Json &config,
+                                             const std::string &section,
+                                             std::string &folder,
+                                             std::vector<std::string> &files)
+{
+  folder = "";
+  files.clear();
+
+  // Section is required.
+  auto jsonSection = config[section];
+  if (jsonSection.is_null())
+    throw std::runtime_error("'" + section + "' section not found in config");
+
+  // Example:
+  // "images": {
+  //   "files": [
+  //     "1.img",
+  //     "2.img"
+  //   ],
+  //   "folder": "/home/d-zobnin/images"
+  // }
+
+  // At least one of 'files' and 'folder' subsections must be given.
+  auto folderSection = jsonSection["folder"];
+  auto filesSection = jsonSection["files"];
+  if (!folderSection.is_string() && !filesSection.is_array())
+    throw std::runtime_error("'files' and 'folder' subsections not found for '"
+                             + section + "' section");
+
+  if (folderSection.is_string())
+    folder = folderSection.string_value();
+
+  if (filesSection.is_array())
+    for (const auto &item : filesSection.array_items()) {
+      if (!item.is_string())
+        throw std::runtime_error("'files' section must contain only strings");
+      files.push_back(item.string_value());
+    }
 }
 
 
@@ -140,7 +234,7 @@ ImageDatabase<I, S>::GetImage(size_t i) const
 {
   assert(i < images.size() && "Image index is out of range!");
 
-  return images[i];
+  return images[i].image;
 }
 
 
@@ -151,7 +245,7 @@ ImageDatabase<I, S>::GetSegmentation(size_t i) const
 {
   assert(i < segmentations.size() && "Segmentation index is out of range!");
 
-  return segmentations[i];
+  return segmentations[i].image;
 }
 
 

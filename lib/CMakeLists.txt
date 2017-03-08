@@ -19,7 +19,10 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
                          -Wcast-align
                          -Wswitch-enum
                          -Wuninitialized)
+
+  target_link_libraries(libOPAL libImageIO "-lstdc++fs")
+else()
+  target_link_libraries(libOPAL libImageIO)
 endif()
 
-target_link_libraries(libOPAL libImageIO)
 target_include_directories(libOPAL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
