@@ -7,6 +7,8 @@ add_subdirectory(json11)
 
 add_library(libOPAL STATIC ${SOURCES})
 
+set(LINK_FLAGS "")
+
 if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU"))
   target_compile_options(libOPAL PRIVATE
@@ -20,9 +22,18 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
                          -Wswitch-enum
                          -Wuninitialized)
 
-  target_link_libraries(libOPAL libImageIO "-lstdc++fs")
-else()
-  target_link_libraries(libOPAL libImageIO)
+  if ("${CMAKE_BUILD_TYPE}" MATCHES "DEBUG")
+    message("Debug build with coverage support")
+    target_compile_options(libOPAL PRIVATE
+                           -g -O0
+                           -fprofile-arcs
+                           -ftest-coverage)
+    set(LINK_FLAGS ${LINK_FLAGS} -lgcov)
+  endif()
+
+  set(LINK_FLAGS ${LINK_FLAGS} -lstdc++fs)
 endif()
+
+target_link_libraries(libOPAL libImageIO ${LINK_FLAGS})
 
 target_include_directories(libOPAL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
