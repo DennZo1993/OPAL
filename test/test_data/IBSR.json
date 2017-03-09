@@ -1,0 +1,29 @@
+{
+  "name": "IBSR",
+  "segmentations": {
+    "files": [
+      "01.img",
+      "02.img",
+      "03.img",
+      "05.img",
+      "06.img",
+      "07.img",
+      "08.img",
+      "09.img",
+      "10.img",
+      "11.img",
+      "12.img",
+      "13.img",
+      "14.img",
+      "15.img",
+      "16.img",
+      "17.img",
+      "18.img"
+    ],
+    "folder": "test_data/Segmentations"
+  },
+  "images": {
+    "extension": ".img",
+    "folder": "test_data/Images"
+  }
+}

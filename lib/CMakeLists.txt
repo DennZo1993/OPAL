@@ -34,6 +34,6 @@ if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
   set(LINK_FLAGS ${LINK_FLAGS} -lstdc++fs)
 endif()
 
-target_link_libraries(libOPAL libImageIO ${LINK_FLAGS})
+target_link_libraries(libOPAL libImageIO json11 ${LINK_FLAGS})
 
 target_include_directories(libOPAL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -76,8 +76,8 @@ private:
   //
   // Throws std::runtime_error if section is not present in the config.
   void ParseConfigSection(const json11::Json &config,
-                          const std::string &section, std::string &folder,
-                          std::vector<std::string> &files);
+                          const std::string &section,
+                          std::vector<std::string> &absFiles);
 
 private:
   std::vector<FileImageType>        images;
@@ -129,7 +129,7 @@ void ImageDatabase<I, S>::Add(const std::string &imageFileName,
 template<class I, class S>
 void ImageDatabase<I, S>::ReadFromConfig(const std::string &fileName)
 {
-  std::string config = ReadFileToString(fileName);
+  std::string config = util::ReadFileToString(fileName);
   std::string parseError;
   auto jsonConfig = json11::Json::parse(config, parseError);
 
@@ -144,24 +144,30 @@ void ImageDatabase<I, S>::ReadFromConfig(const std::string &fileName)
   if (!name.is_null())
     dbName = name.string_value();
 
-  std::string imagesFolder;
   std::vector<std::string> imagesFiles;
-  ParseConfigSection(jsonConfig, "images", imagesFolder, imagesFiles);
+  ParseConfigSection(jsonConfig, "images", imagesFiles);
 
-  std::string segFolder;
   std::vector<std::string> segFiles;
-  ParseConfigSection(jsonConfig, "segmentations", segFolder, segFiles);
+  ParseConfigSection(jsonConfig, "segmentations", segFiles);
+
+  if (imagesFiles.size() != segFiles.size())
+    throw std::runtime_error("Images / segmentations files count mismatch");
+
+  // Read files.
+  for (size_t i = 0; i < imagesFiles.size(); ++i)
+    Add(imagesFiles[i], segFiles[i]);
 }
 
 
 template<class I, class S>
 void ImageDatabase<I, S>::ParseConfigSection(const json11::Json &config,
                                              const std::string &section,
-                                             std::string &folder,
-                                             std::vector<std::string> &files)
+                                             std::vector<std::string> &absFiles)
 {
-  folder = "";
-  files.clear();
+  std::string folder = "";
+  std::string extension = "";
+  std::vector<std::string> configFiles;
+  absFiles.clear();
 
   // Section is required.
   auto jsonSection = config[section];
@@ -180,6 +186,7 @@ void ImageDatabase<I, S>::ParseConfigSection(const json11::Json &config,
   // At least one of 'files' and 'folder' subsections must be given.
   auto folderSection = jsonSection["folder"];
   auto filesSection = jsonSection["files"];
+  auto extensionSection = jsonSection["extension"];
   if (!folderSection.is_string() && !filesSection.is_array())
     throw std::runtime_error("'files' and 'folder' subsections not found for '"
                              + section + "' section");
@@ -187,12 +194,23 @@ void ImageDatabase<I, S>::ParseConfigSection(const json11::Json &config,
   if (folderSection.is_string())
     folder = folderSection.string_value();
 
+  if (extensionSection.is_string())
+    extension = extensionSection.string_value();
+
   if (filesSection.is_array())
     for (const auto &item : filesSection.array_items()) {
       if (!item.is_string())
         throw std::runtime_error("'files' section must contain only strings");
-      files.push_back(item.string_value());
+      configFiles.push_back(item.string_value());
     }
+
+  // If 'files' is not given, read all files from 'folder'.
+  if (configFiles.empty()) {
+    absFiles = util::ListDir(folder, extension, /*sorted=*/ true);
+  } else {
+    for (const auto &f : configFiles)
+      absFiles.push_back(util::ConcatPaths(folder, f));
+  }
 }
 
 

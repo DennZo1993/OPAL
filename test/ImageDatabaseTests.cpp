@@ -63,3 +63,10 @@ TEST(ImageDatabaseTests, TestLoadPNGImageAndPixels) {
   }
 }
 
+
+TEST(ImageDatabaseTests, TestReadFromConfig) {
+  ImageDatabase<double, int> db;
+  db.ReadFromConfig("test_data/IBSR.json");
+
+  ASSERT_EQ(17, db.GetImageCount());
+}

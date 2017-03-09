@@ -79,7 +79,7 @@ private:
 
 
   std::string GetHeaderFileName() const {
-    auto p = SplitStringByLast(SuperClass::fileName, '.');
+    auto p = util::SplitStringByLast(SuperClass::fileName, '.');
     return p.first + ".hdr";
   }
 

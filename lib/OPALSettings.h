@@ -76,9 +76,9 @@ public:
 
     std::ifstream ifs(fileName);
     std::string line;
-  
+
     while (ifs >> line) {
-      auto keyValue = SplitStringByLast(line, '=');
+      auto keyValue = util::SplitStringByLast(line, '=');
       settings[keyValue.first] = keyValue.second;
     }
 

@@ -3,6 +3,9 @@
 #include <experimental/filesystem>
 
 
+using namespace util;
+
+
 TEST(util, FileToStringEmpty) {
   auto s = ReadFileToString("missing_file");
   ASSERT_EQ("", s);
@@ -23,7 +26,7 @@ TEST(util, FileToStringMultipleLines) {
 
 TEST(util, ListDirSorted) {
   namespace fs = std::experimental::filesystem;
-  auto files = ListDir("test_data/dir", /*sorted=*/ true);
+  auto files = ListDir("test_data/dir", /*ext=*/ "", /*sorted=*/ true);
   ASSERT_EQ(3, files.size());
   ASSERT_EQ("1.txt", fs::path(files[0]).filename());
   ASSERT_EQ("2.txt", fs::path(files[1]).filename());

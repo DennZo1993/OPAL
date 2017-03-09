@@ -12,7 +12,7 @@ namespace ImageIO {
 
 template <class T>
 Image<T> ReadImage(const std::string &fileName) {
-  auto fileNameParts = SplitStringByLast(fileName, '.');
+  auto fileNameParts = util::SplitStringByLast(fileName, '.');
 
   ImageReader<T> *reader = nullptr;
 
@@ -35,7 +35,7 @@ Image<T> ReadImage(const std::string &fileName) {
 
 template <class T>
 void WriteImage(const Image<T> &image, const std::string &fileName) {
-  auto fileNameParts = SplitStringByLast(fileName, '.');
+  auto fileNameParts = util::SplitStringByLast(fileName, '.');
 
   ImageWriter<T> *writer = nullptr;
 
