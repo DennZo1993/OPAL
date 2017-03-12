@@ -90,7 +90,8 @@ SET(TEST_SOURCES main.cpp
                  ImageDatabaseTests.cpp
 
                  OPAL/Constructor.cpp
-                 OPAL/Initialization.cpp)
+                 OPAL/Initialization.cpp
+                 OPAL/MaxVoteLabelEstimatorTest.cpp)
 
 ADD_EXECUTABLE(Tests ${TEST_SOURCES})
 
