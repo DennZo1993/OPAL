@@ -10,22 +10,32 @@ def parse_args():
 
   parser.add_argument('-d', '--debug',
                       action='store_true',
-                      default=False)
+                      default=False,
+                      help='Debug build')
 
   parser.add_argument('-r', '--release',
                       action='store_true',
-                      default=False)
+                      default=False,
+                      help='Release build')
 
   parser.add_argument('-t', '--test',
                       action='store_true',
-                      default=False)
+                      default=False,
+                      help='Run tests after successful build')
 
   parser.add_argument('-c', '--compiler',
-                      default='clang++')
+                      default='clang++',
+                      help='C++ compiler to use')
 
   parser.add_argument('--cov',
                       action='store_true',
-                      default=False)
+                      default=False,
+                      help='Collect coverage data')
+
+  parser.add_argument('--clear',
+                      action='store_true',
+                      default=False,
+                      help='Clear previous build data first')
 
   args = parser.parse_args()
   if args.debug == True and args.release == True:
@@ -36,7 +46,12 @@ def parse_args():
 
 def build(args):
   def goto_build_dir():
+    import shutil
+
     BUILD_DIR = 'build'
+    if args.clear:
+      shutil.rmtree(BUILD_DIR, ignore_errors=True)
+
     if not os.path.exists(BUILD_DIR):
       os.makedirs(BUILD_DIR)
 
