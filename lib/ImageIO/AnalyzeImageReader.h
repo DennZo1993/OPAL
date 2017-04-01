@@ -19,11 +19,8 @@ public:
   using Self       = AnalyzeImageReader<T>;
   using SuperClass = ImageReader<T>;
 
-  AnalyzeImageReader(const std::string &file)
-    : SuperClass(file)
-    , header()
-  {}
-
+  // Inherit constructor.
+  using SuperClass::SuperClass;
 
   virtual void Read() override {
     ReadHdrFile();
@@ -36,7 +33,7 @@ private:
 
     FILE *headerInput = fopen(hdrFileName.c_str(), "r");
     if (!headerInput)
-      throw std::invalid_argument("Cannot open hdr file for reading!");
+      throw std::runtime_error("Cannot open hdr file for reading!");
 
     header.ReadFromFile(headerInput);
   }
@@ -48,6 +45,7 @@ private:
     DataType result;
     if (fread(&result, size, 1, in) != 1)
       throw std::runtime_error("Cannot read pixel from file!");
+
     return static_cast<T>(result);
   }
 
@@ -55,7 +53,7 @@ private:
   void ReadImgFile() {
     FILE *imgInput = fopen(SuperClass::fileName.c_str(), "r");
     if (!imgInput)
-      throw std::invalid_argument("Cannot open img file for reading!");
+      throw std::runtime_error("Cannot open img file for reading!");
 
     // Resolve reader for pixel type.
     using ReaderType = std::function<T(FILE*, size_t)>;
@@ -83,6 +81,7 @@ private:
     return p.first + ".hdr";
   }
 
+private:
   Analyze::AnalyzeFileHeader header;
 };
 

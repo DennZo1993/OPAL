@@ -40,30 +40,29 @@ public:
   using Self       = PngImageReader<T>;
   using SuperClass = ImageReader<T>;
 
-  PngImageReader(const std::string &fileName)
-    : SuperClass(fileName)
-  {}
+  // Inherit constructor.
+  using SuperClass::SuperClass;
 
-  void Read() {
+  void Read() override {
     std::vector<RGBAPixel::PixelType> png;
-    std::vector<RGBAPixel::PixelType> image;
+    std::vector<RGBAPixel::PixelType> img;
     unsigned width = 0, height = 0;
 
     if (lodepng::load_file(png, SuperClass::fileName))
       throw std::runtime_error("Error loading PNG file " +
                                SuperClass::fileName);
 
-    if (lodepng::decode(image, width, height, png))
+    if (lodepng::decode(img, width, height, png))
       throw std::runtime_error("Error decoding PNG file " +
                                SuperClass::fileName);
 
     Image<RGBAPixel> rgbImage(height, width);
 
     for (size_t i = 0; i < rgbImage.getSize(); ++i) {
-      auto r = image[4 * i + 0];
-      auto g = image[4 * i + 1];
-      auto b = image[4 * i + 2];
-      auto a = image[4 * i + 3];
+      auto r = img[4 * i + 0];
+      auto g = img[4 * i + 1];
+      auto b = img[4 * i + 2];
+      auto a = img[4 * i + 3];
       rgbImage[i] = RGBAPixel(r, g, b, a);
     }
 

@@ -11,7 +11,6 @@ class ImageReader {
 public:
   ImageReader(const std::string &file)
     : fileName(file)
-    , image()
   {}
 
   virtual ~ImageReader() = default;
@@ -19,6 +18,7 @@ public:
   virtual void Read() = 0;
 
   void SetFileName(const std::string &file) { fileName = file; }
+
   const Image<T> & GetImage() const { return image; }
 
 protected:
@@ -26,8 +26,5 @@ protected:
   Image<T> image;
 };
 
-
-//std::pair<std::string, std::string>
-//SplitFileName(const std::string &fileName);
 
 } // namespace ImageIO
