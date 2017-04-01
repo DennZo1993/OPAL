@@ -20,7 +20,12 @@ public:
       sumWeightMap[p.first] += p.second;
     }
 
-    auto maxIt = std::max_element(sumWeightMap.begin(), sumWeightMap.end());
+    auto maxIt =
+      std::max_element(sumWeightMap.begin(), sumWeightMap.end(),
+                       [](const std::pair<LabelType, WeightType> &f,
+                          const std::pair<LabelType, WeightType> &s) -> bool {
+                            return f.second < s.second;
+                       });
     return maxIt->first;
   }
 };
