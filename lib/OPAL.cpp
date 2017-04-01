@@ -38,7 +38,7 @@ OPAL::OPAL(const OPALSettings &settings, const DatabaseType &database)
 
   // Initialize random generator.
   std::random_device rd;
-  randGen.seed(rd());
+  randGen.seed(0);
 }
 
 
@@ -184,14 +184,25 @@ int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
 
 
 void OPAL::BuildSegmentation() {
+  CandidateLabelsContainer candidates;
+
+  size_t mismatchTimes = 0;
+
   for (size_t i = Sets.patchRadius; i + Sets.patchRadius < ImageHeight; ++i)
     for (size_t j = Sets.patchRadius; j + Sets.patchRadius < ImageWidth; ++j) {
       const auto &curDst = Database.GetSegmentation(FieldT(i, j));
       const auto OffsetX = FieldX(i, j);
       const auto OffsetY = FieldY(i, j);
 
-      OutputSegmentation(i,j) = curDst(i + OffsetY, j + OffsetX);
+      auto oldRes = curDst(i + OffsetY, j + OffsetX);
+      GetCandidateLabelsForPixel(i, j, candidates);
+      OutputSegmentation(i,j) = finalLabelEstimator.EstimateLabel(candidates);
+
+      if (OutputSegmentation(i,j) != oldRes)
+        ++mismatchTimes;
     }
+
+  std::cout << "Mismatch times: " << mismatchTimes << std::endl;
 }
 
 
@@ -231,4 +242,29 @@ void OPAL::UpdateSSDMap() {
       SSDMap(i, j) = SSDAt(i, j);
     } // for (j)
   } // for (i)
+}
+
+void OPAL::GetCandidateLabelsForPixel(
+    size_t i, size_t j, OPAL::CandidateLabelsContainer &result) const
+{
+  assert(i >= Sets.patchRadius && i + Sets.patchRadius < ImageHeight &&
+         "index i is out of range!");
+  assert(j >= Sets.patchRadius && j + Sets.patchRadius < ImageWidth &&
+         "index j is out of range!");
+
+  //constexpr double CANDIDATE_WEIGHT = 1.0;
+
+  result.clear();
+
+  for (size_t di = i - Sets.patchRadius; di <= i + Sets.patchRadius; ++di)
+    for (size_t dj = j - Sets.patchRadius; dj <= j + Sets.patchRadius; ++dj) {
+      const auto &curDst = Database.GetSegmentation(FieldT(di, dj));
+      const auto OffsetX = FieldX(di, dj);
+      const auto OffsetY = FieldY(di, dj);
+
+      const auto label = curDst(di + OffsetY, dj + OffsetX);
+
+      auto CANDIDATE_WEIGHT = 1.0 / SSDMap(di, dj).GetValue();
+      result.push_back(std::make_pair(label, CANDIDATE_WEIGHT));
+    }
 }

@@ -3,6 +3,8 @@
 #include "ImageDatabase.h"
 #include "OPALSettings.h"
 #include "SSDObject.h"
+#include "MaxVoteLabelEstimator.h"
+#include "DummyLabelEstimator.h"
 
 #include <chrono>
 #include <random>
@@ -78,6 +80,11 @@ private:
   using RandomGeneratorType = std::mt19937;
   RandomGeneratorType randGen;
 
+  using FinalLabelEstimator = MaxVoteLabelEstimator<SegmentationPixelType>;
+  //using FinalLabelEstimator = DummyLabelEstimator<SegmentationPixelType>;
+  using CandidateLabelsContainer = FinalLabelEstimator::CandidateContainer;
+  FinalLabelEstimator finalLabelEstimator;
+
 private:
   int PropagatePixel(size_t i, size_t j, int delta);
 
@@ -89,4 +96,7 @@ private:
 
   // Recalculate the whole SSD map.
   void UpdateSSDMap();
+
+  void GetCandidateLabelsForPixel(size_t i, size_t j,
+                                  CandidateLabelsContainer &result) const;
 };
