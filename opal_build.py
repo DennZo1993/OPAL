@@ -37,6 +37,11 @@ def parse_args():
                       default=False,
                       help='Clear previous build data first')
 
+  parser.add_argument('-v', '--verbose',
+                      action='store_true',
+                      default=False,
+                      help='Verbose output')
+
   args = parser.parse_args()
   if args.debug == True and args.release == True:
     raise RuntimeError('Both debug and release flags set!')
@@ -75,7 +80,11 @@ def build(args):
 
   def run_tests():
     if args.test:
-      subprocess.check_call(['ctest', '--verbose'])
+      cmd_list = ['ctest']
+      if args.verbose:
+        cmd_list.append('--verbose')
+
+      subprocess.check_call(cmd_list)
 
 
   goto_build_dir()
