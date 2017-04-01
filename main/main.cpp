@@ -1,3 +1,25 @@
+/**
+ * \file main/main.cpp
+ *
+ * @author Denis Zobnin
+ *
+ * @brief Entry point of OPAL application.
+ *
+ * Defines the entry point of OPAL application. All main logic is prepared and
+ * called from here.
+ *
+ *
+ * @mainpage OPAL Main Page
+ *
+ * Optimized PatchMatch
+ *
+ * <B>Original paper: </B>
+ * <I>Vinh-Thong Ta, R´emi Giraud, D. Louis Collins, Pierrick Coup´e.
+ * Optimized PatchMatch for Near Real Time and Accurate Label Fusion.
+ * MICCAI 2014, Sep 2014, United States. 8 p., 2014.</I>
+ */
+
+
 #include "OPAL.h"
 #include "ImageIO.h"
 #include "SegmentationColorsConverter.h"
