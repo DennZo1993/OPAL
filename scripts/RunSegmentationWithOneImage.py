@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from Common import *
 from config import *
 import subprocess
