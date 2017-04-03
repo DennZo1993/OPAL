@@ -1,6 +1,7 @@
 set (SOURCES util.cpp
              RGBAPixel.cpp
-             OPAL.cpp)
+             OPAL.cpp
+             OPALSettings.cpp)
 
 add_subdirectory(ImageIO)
 add_subdirectory(json11)
