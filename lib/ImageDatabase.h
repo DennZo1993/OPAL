@@ -35,10 +35,37 @@ public:
   ImageDatabase() = default;
 
 public:
-  // Add a pair of image and its segmentation. Reads both from files.
-  //
-  // Throws std::runtime_error.
+  /**
+   * @brief Adds a pair of image and its segmentation. Reads both from files.
+   *
+   * @param [in] imageFileName Name of image file.
+   * @param [in] segFileName Name of segmentation file.
+   *
+   * @throws std::runtime_error.
+   */
   void Add(const std::string &imageFileName, const std::string &segFileName);
+
+  /**
+   * @brief Adds a pair "image, its segmentation" without reading files from
+   * file system.
+   *
+   * Names of files can be passed, but are used only for logging.
+   * The following conditions must be met for successful run:
+   *   1. Image and segmentation must be non-empty.
+   *   2. Size of image matches size of segmentation.
+   *   3. Size of image matches size of other images in the database.
+   *
+   * @param [in] imgMat Image.
+   * @param [in] segMat Segmentation.
+   * @param [in] imageFileName Name of image file (optional).
+   * @param [in] segFileName Name of segmentation file (optional).
+   *
+   * @throws std::runtime_error.
+   */
+  void Add(const ImageType &imgMat,
+           const SegmentationType &segMat,
+           const std::string &imageFileName = "",
+           const std::string &segFileName = "");
 
   // Read a JSON config file and fill the database accordingly.
   void ReadFromConfig(const std::string &fileName);
@@ -97,6 +124,16 @@ void ImageDatabase<I, S>::Add(const std::string &imageFileName,
   auto imgMat = ImageIO::ReadImage<ImagePixelType>(imageFileName);
   auto segMat = ImageIO::ReadImage<SegmentationPixelType>(segFileName);
 
+  Add(imgMat, segMat, imageFileName, segFileName);
+}
+
+
+template <class I, class S>
+void ImageDatabase<I, S>::Add(const ImageType &imgMat,
+                              const SegmentationType &segMat,
+                              const std::string &imageFileName,
+                              const std::string &segFileName)
+{
   // Don't add empty images.
   if (imgMat.isEmpty() || segMat.isEmpty())
     throw std::runtime_error("Loaded empty image or segmentation!");
