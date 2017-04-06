@@ -85,13 +85,13 @@ SET(TEST_SOURCES main.cpp
                  Matrix/AdditionSubtraction.cpp
                  Matrix/Relation.cpp
                  Matrix/Assign.cpp
-                 #Matrix/SSD.cpp
 
                  ImageDatabaseTests.cpp
 
                  OPAL/Constructor.cpp
                  OPAL/Initialization.cpp
                  OPAL/MaxVoteLabelEstimatorTest.cpp
+                 OPAL/SSD.cpp
 
                  ImageIO/AnalyzeImageReaderTest.cpp
                  ImageIO/PngImageReaderTest.cpp

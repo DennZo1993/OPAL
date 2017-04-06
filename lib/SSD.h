@@ -91,8 +91,18 @@ public:
 
   bool ShiftDown();
 
+  /**
+   * @brief Same (x,y) coordinates on database[movingIndex - 1].
+   *
+   * @returns Calculated flag.
+   */
   bool ShiftTop();
 
+  /**
+   * @brief Same (x,y) coordinates on database[movingIndex + 1].
+   *
+   * @returns Calculated flag.
+   */
   bool ShiftBottom();
 
 private:
@@ -108,7 +118,7 @@ private:
    * @param x X-coordinate of top-left corner of patch
    * @param y Y-coordinate of top-left corner of patch
    */
-  static bool PatchInsideImage(const size_t x, const size_t y);
+  bool PatchInsideImage(const size_t x, const size_t y);
 
 private:
   /// Database of images.
@@ -157,10 +167,11 @@ private:
 
 // ===== Implementation below =====
 
-SSD::SSD(const DatabaseType &db, size_t idx,
-         size_t ctrFixedX, size_t ctrFixedY,
-         size_t ctrMovingX, size_t ctrMovingY,
-         size_t radius)
+template <class DatabaseType>
+SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
+                       size_t ctrFixedX, size_t ctrFixedY,
+                       size_t ctrMovingX, size_t ctrMovingY,
+                       size_t radius)
   : database(db)
   , movingIndex(idx)
   , patchRadius(radius)
@@ -193,7 +204,8 @@ SSD::SSD(const DatabaseType &db, size_t idx,
 }
 
 
-SSD::PixelType SSD::GetValue() const
+template <class DatabaseType>
+typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::GetValue() const
 {
   assert(calculated && "Value query from an invalid SSD object!");
 
@@ -201,19 +213,22 @@ SSD::PixelType SSD::GetValue() const
 }
 
 
-SSD::operator PixelType() const
+template <class DatabaseType>
+SSD<DatabaseType>::operator PixelType() const
 {
   return GetValue();
 }
 
 
-SSD::operator bool() const
+template <class DatabaseType>
+SSD<DatabaseType>::operator bool() const
 {
   return calculated;
 }
 
 
-bool SSD::operator <(const SSD &other)
+template <class DatabaseType>
+bool SSD<DatabaseType>::operator <(const SSD &other) const
 {
   if (!calculated)
     return false;
@@ -223,43 +238,74 @@ bool SSD::operator <(const SSD &other)
 }
 
 
-bool SSD::ShiftRight()
+template <class DatabaseType>
+bool SSD<DatabaseType>::ShiftRight()
 {
   return calculated;
 }
 
 
-bool SSD::ShiftLeft()
+template <class DatabaseType>
+bool SSD<DatabaseType>::ShiftLeft()
 {
   return calculated;
 }
 
 
-bool SSD::ShiftUp()
+template <class DatabaseType>
+bool SSD<DatabaseType>::ShiftUp()
 {
   return calculated;
 }
 
 
-bool SSD::ShiftDown()
+template <class DatabaseType>
+bool SSD<DatabaseType>::ShiftDown()
 {
   return calculated;
 }
 
 
-bool SSD::ShiftTop()
+template <class DatabaseType>
+bool SSD<DatabaseType>::ShiftTop()
 {
+  assert(calculated && "Shifting invalid SSD object!");
+
+  if (movingIndex < 2) {
+    // We're already at database[1], cannot go up the base.
+    calculated = false;
+  } else {
+    --movingIndex;
+    movingImage = &database.GetImage(movingIndex);
+
+    CalculateValue();
+  }
+
   return calculated;
 }
 
 
-bool SSD::ShiftBottom()
+template <class DatabaseType>
+bool SSD<DatabaseType>::ShiftBottom()
 {
+  assert(calculated && "Shifting invalid SSD object!");
+
+  if (movingIndex + 1 == database.GetImageCount()) {
+    // We're at the last image in database, nowhere to go down.
+    calculated = false;
+  } else {
+    ++movingIndex;
+    movingImage = &database.GetImage(movingIndex);
+
+    CalculateValue();
+  }
+
   return calculated;
 }
 
 
-void SSD::CalculateValue()
+template <class DatabaseType>
+void SSD<DatabaseType>::CalculateValue()
 {
   value = 0;
   for (size_t dy = 0; dy < patchSide; ++dy)
@@ -272,7 +318,8 @@ void SSD::CalculateValue()
 }
 
 
-bool SSD::PatchInsideImage(const size_t x, const size_t y)
+template <class DatabaseType>
+bool SSD<DatabaseType>::PatchInsideImage(const size_t x, const size_t y)
 {
   // x and y are coordinates of top-left corner of a patch.
   // Because of size_t type we don't need to check that x >= 0 and y >= 0.
