@@ -83,12 +83,32 @@ public:
 public:
   // Methods for efficient update.
 
+  /**
+   * @brief Same moving image, (x+1,y) on both fixed and moving images.
+   *
+   * @returns Calculated flag.
+   */
   bool ShiftRight();
 
+  /**
+   * @brief Same moving image, (x-1,y) on both fixed and moving images.
+   *
+   * @returns Calculated flag.
+   */
   bool ShiftLeft();
 
+  /**
+   * @brief Same moving image, (x,y-1) on both fixed and moving images.
+   *
+   * @returns Calculated flag.
+   */
   bool ShiftUp();
 
+  /**
+   * @brief Same moving image, (x,y+1) on both fixed and moving images.
+   *
+   * @returns Calculated flag.
+   */
   bool ShiftDown();
 
   /**
@@ -241,6 +261,27 @@ bool SSD<DatabaseType>::operator <(const SSD &other) const
 template <class DatabaseType>
 bool SSD<DatabaseType>::ShiftRight()
 {
+  assert(calculated && "Shifting invalid SSD object!");
+
+  if (fixedTopLeftX + 1 + patchSide <= imageWidth &&
+      movingTopLeftX + 1 + patchSide <= imageWidth) {
+    for (size_t dy = 0; dy < patchSide; ++dy) {
+      PixelType diff1 =
+        (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX + patchSide) -
+        (*movingImage)(movingTopLeftY + dy, movingTopLeftX + patchSide);
+
+      PixelType diff2 =
+        (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX) -
+        (*movingImage)(movingTopLeftY + dy, movingTopLeftX);
+
+      value += (diff1 * diff1 - diff2 * diff2);
+    }
+    ++fixedTopLeftX;
+    ++movingTopLeftX;
+  } else {
+    calculated = false;
+  }
+
   return calculated;
 }
 
@@ -248,6 +289,7 @@ bool SSD<DatabaseType>::ShiftRight()
 template <class DatabaseType>
 bool SSD<DatabaseType>::ShiftLeft()
 {
+  assert(calculated && "Shifting invalid SSD object!");
   return calculated;
 }
 
@@ -255,6 +297,7 @@ bool SSD<DatabaseType>::ShiftLeft()
 template <class DatabaseType>
 bool SSD<DatabaseType>::ShiftUp()
 {
+  assert(calculated && "Shifting invalid SSD object!");
   return calculated;
 }
 
@@ -262,6 +305,7 @@ bool SSD<DatabaseType>::ShiftUp()
 template <class DatabaseType>
 bool SSD<DatabaseType>::ShiftDown()
 {
+  assert(calculated && "Shifting invalid SSD object!");
   return calculated;
 }
 

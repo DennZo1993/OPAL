@@ -2,6 +2,9 @@
 #include "SSD.h"
 #include "gtest/gtest.h"
 
+// Death tests below check assertion failures in the code, so put them
+// into #ifndef NDEBUG guards.
+
 
 // Global image database (IBSR).
 using DatabaseType = ImageDatabase<double, int>;
@@ -33,15 +36,14 @@ TEST_F(SSDShiftTest, ConstructionBad1) {
     SSD<DatabaseType> ssd(db, /*idx*/1, /*fix*/2, 2, /*mov*/1, 3, /*radius*/2);
   };
 
+#ifndef NDEBUG
   ASSERT_DEATH(creator(), "Patch is outside moving image!");
+#endif
 }
 
 
 TEST_F(SSDShiftTest, ShiftTop1) {
-  SSD<DatabaseType> ssd(db, /*idx=*/ 1,
-                        /*ctrFixedX=*/ 2, /*ctrFixedY=*/ 2,
-                        /*ctrMovingX=*/ 1, /*ctrMovingY=*/ 3,
-                        /*radius=*/ 1);
+  SSD<DatabaseType> ssd(db, /*idx=*/ 1, /*fix*/2, 2,/*mov*/1, 3, /*radius=*/ 1);
 
   ASSERT_TRUE(ssd);
   ASSERT_EQ(9, ssd.GetValue());
@@ -53,10 +55,7 @@ TEST_F(SSDShiftTest, ShiftTop1) {
 
 
 TEST_F(SSDShiftTest, ShiftTop2) {
-  SSD<DatabaseType> ssd(db, /*idx=*/ 3,
-                        /*ctrFixedX=*/ 2, /*ctrFixedY=*/ 2,
-                        /*ctrMovingX=*/ 1, /*ctrMovingY=*/ 3,
-                        /*radius=*/ 1);
+  SSD<DatabaseType> ssd(db, /*idx=*/ 3, /*fix*/2, 2,/*mov*/1, 3, /*radius=*/ 1);
 
   ASSERT_TRUE(ssd);
   ASSERT_EQ(81, ssd.GetValue());
@@ -72,15 +71,14 @@ TEST_F(SSDShiftTest, ShiftTop2) {
   ssd.ShiftTop(); // Nowhere to shift.
   ASSERT_FALSE(ssd);
 
+#ifndef NDEBUG
   ASSERT_DEATH(ssd.ShiftBottom(), ".*"); // Cannot shift invalid SSD.
+#endif
 }
 
 
 TEST_F(SSDShiftTest, ShiftBottom1) {
-  SSD<DatabaseType> ssd(db, /*idx=*/ 3,
-                        /*ctrFixedX=*/ 2, /*ctrFixedY=*/ 2,
-                        /*ctrMovingX=*/ 1, /*ctrMovingY=*/ 3,
-                        /*radius=*/ 1);
+  SSD<DatabaseType> ssd(db, /*idx=*/ 3, /*fix*/2, 2,/*mov*/1, 3, /*radius=*/ 1);
 
   ASSERT_TRUE(ssd);
   ASSERT_EQ(81, ssd.GetValue());
@@ -92,10 +90,7 @@ TEST_F(SSDShiftTest, ShiftBottom1) {
 
 
 TEST_F(SSDShiftTest, ShiftBottom2) {
-  SSD<DatabaseType> ssd(db, /*idx=*/ 1,
-                        /*ctrFixedX=*/ 2, /*ctrFixedY=*/ 2,
-                        /*ctrMovingX=*/ 1, /*ctrMovingY=*/ 3,
-                        /*radius=*/ 1);
+  SSD<DatabaseType> ssd(db, /*idx=*/ 1, /*fix*/2, 2,/*mov*/1, 3, /*radius=*/ 1);
 
   ASSERT_TRUE(ssd);
   ASSERT_EQ(9, ssd.GetValue());
@@ -111,5 +106,20 @@ TEST_F(SSDShiftTest, ShiftBottom2) {
   ssd.ShiftBottom(); // Nowhere to shift.
   ASSERT_FALSE(ssd);
 
+#ifndef NDEBUG
   ASSERT_DEATH(ssd.ShiftTop(), ".*"); // Cannot shift invalid SSD.
+#endif
+}
+
+
+TEST_F(SSDShiftTest, ShiftRight1) {
+  SSD<DatabaseType> ssd(db, /*idx=*/ 1, /*fix*/2, 2,/*mov*/1, 1, /*radius=*/ 1);
+
+  ASSERT_EQ(9, ssd.GetValue());
+
+  ssd.ShiftRight();
+  ASSERT_EQ(9, ssd.GetValue());
+
+  ssd.ShiftRight();
+  ASSERT_FALSE(ssd);
 }
