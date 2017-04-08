@@ -50,6 +50,11 @@ def parse_args():
 
 
 def build(args):
+  # Resolve build type.
+  build_type = 'Coverage' if args.cov \
+                          else 'Release' if args.release \
+                                         else 'Debug'
+
   def goto_build_dir():
     import shutil
 
@@ -63,12 +68,7 @@ def build(args):
     os.chdir(BUILD_DIR)
 
   def run_cmake():
-    cmake_cmd = ['cmake']
-    build_type = 'Coverage' if args.cov \
-                            else 'Release' if args.release \
-                                           else 'Debug'
-
-    cmake_cmd.append('-DCMAKE_BUILD_TYPE=' + build_type)
+    cmake_cmd = ['cmake', '-DCMAKE_BUILD_TYPE=' + build_type]
     if args.compiler:
       cmake_cmd.append('-DCMAKE_CXX_COMPILER=' + args.compiler)
     cmake_cmd.append('..')
@@ -76,16 +76,15 @@ def build(args):
     subprocess.check_call(cmake_cmd)
 
   def run_make():
-    subprocess.check_call(['make', '-j4'])
+    subprocess.check_call(['cmake', '--build', '.', '--config', build_type])
 
   def run_tests():
     if args.test:
-      cmd_list = ['ctest']
+      cmd_list = ['ctest', '-C', build_type]
       if args.verbose:
         cmd_list.append('--verbose')
 
       subprocess.check_call(cmd_list)
-
 
   goto_build_dir()
   run_cmake()
