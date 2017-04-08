@@ -96,6 +96,7 @@ SET(TEST_SOURCES main.cpp
 
                  util/FileTest.cpp
                  util/DirectoryTest.cpp
+                 util/JsonTest.cpp
     )
 
 ADD_EXECUTABLE(Tests ${TEST_SOURCES})

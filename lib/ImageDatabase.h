@@ -5,8 +5,7 @@
 
 #include "util/fs/File.h"
 #include "util/fs/Directory.h"
-
-#include "json11/json11.hpp"
+#include "util/json/json.h"
 
 #include <stdexcept>
 #include <cassert>
@@ -101,11 +100,13 @@ public:
   size_t GetImageWidth()  const { return imageWidth;  }
 
 private:
+  void ReadFromJson(const util::Json &jsonConfig);
+
   // Parse 'images' or 'segmentation' section. Section is required.
   // files and folder are cleared first.
   //
   // Throws std::runtime_error if section is not present in the config.
-  void ParseConfigSection(const json11::Json &config,
+  void ParseConfigSection(const util::Json &config,
                           const std::string &section,
                           std::vector<std::string> &absFiles);
 
@@ -169,16 +170,13 @@ void ImageDatabase<I, S>::Add(const ImageType &imgMat,
 template<class I, class S>
 void ImageDatabase<I, S>::ReadFromConfig(const std::string &fileName)
 {
-  std::string config = util::ReadFileToString(fileName);
-  std::string parseError;
-  auto jsonConfig = json11::Json::parse(config, parseError);
+  return ReadFromJson(util::JsonFromFile(fileName));
+}
 
-  if (jsonConfig.is_null())
-    throw std::runtime_error("Error while parsing JSON from " + fileName +
-                             " - " + parseError);
 
-  // Retrieve info from config.
-
+template <class I, class S>
+void ImageDatabase<I, S>::ReadFromJson(const util::Json &jsonConfig)
+{
   // Database name (optional).
   auto name = jsonConfig["name"];
   if (!name.is_null())
@@ -200,7 +198,7 @@ void ImageDatabase<I, S>::ReadFromConfig(const std::string &fileName)
 
 
 template<class I, class S>
-void ImageDatabase<I, S>::ParseConfigSection(const json11::Json &config,
+void ImageDatabase<I, S>::ParseConfigSection(const util::Json &config,
                                              const std::string &section,
                                              std::vector<std::string> &absFiles)
 {
