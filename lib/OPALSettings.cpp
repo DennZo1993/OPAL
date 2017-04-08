@@ -1,7 +1,8 @@
 #include "OPALSettings.h"
-#include "util.h"
+#include "util/string/Split.h"
 
 #include <iostream>
+#include <fstream>
 
 
 OPALSettings::OPALSettings(size_t _initWindowRadius,

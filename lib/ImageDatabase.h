@@ -2,7 +2,10 @@
 
 #include "Image.h"
 #include "ImageIO/ImageIO.h"
-#include "util.h" // ReadFileToString
+
+#include "util/fs/File.h"
+#include "util/fs/Directory.h"
+
 #include "json11/json11.hpp"
 
 #include <stdexcept>

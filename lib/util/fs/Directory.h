@@ -1,19 +1,11 @@
 #pragma once
 
-#include <utility>
-#include <string>
-#include <fstream>
-#include <vector>
 #include <experimental/filesystem>
+#include <string>
+#include <vector>
 
 
-namespace util
-{
-
-// Splits string by the last occurence of the delimiter.
-std::pair<std::string, std::string>
-SplitStringByLast(const std::string &str, char delim);
-
+namespace util {
 
 // List contents orf the directory.
 std::vector<std::string> ListDir(const std::string &dirName,
@@ -37,10 +29,5 @@ inline std::string ConcatPaths(const std::string &first, Types... args)
   return firstPath.string();
 }
 
-
-// Reads the contents of the file into std::string.
-std::string ReadFileToString(const std::string &fileName);
-
-std::string ReadFileToString(std::ifstream &ifs);
-
 } // namespace util
+

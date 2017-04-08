@@ -2,7 +2,7 @@
 
 #include "AnalyzeHeader.h"
 #include "ImageReader.h"
-#include "util.h"
+#include "util/string/Split.h"
 
 #include <cstdio>
 #include <stdexcept>

@@ -75,8 +75,6 @@ endif()
 SET(TEST_SOURCES main.cpp
                  Common.cpp
 
-                 UtilTests.cpp
-
                  Matrix/Constructors.cpp
                  Matrix/Allocation.cpp
                  #Matrix/Read.cpp
@@ -95,6 +93,9 @@ SET(TEST_SOURCES main.cpp
 
                  ImageIO/AnalyzeImageReaderTest.cpp
                  ImageIO/PngImageReaderTest.cpp
+
+                 util/FileTest.cpp
+                 util/DirectoryTest.cpp
     )
 
 ADD_EXECUTABLE(Tests ${TEST_SOURCES})
