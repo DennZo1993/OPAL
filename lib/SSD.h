@@ -323,6 +323,28 @@ template <class DatabaseType>
 bool SSD<DatabaseType>::ShiftUp()
 {
   assert(calculated && "Shifting invalid SSD object!");
+
+  // Boundary checks.
+  if (fixedTopLeftY > 0 && movingTopLeftY > 0) {
+    for (size_t dx = 0; dx < patchSide; ++dx) {
+      // Step to new place (1 px up the upper side), add it.
+      PixelType diff1 =
+        (*fixedImage)(fixedTopLeftY - 1, fixedTopLeftX + dx) -
+        (*movingImage)(movingTopLeftY - 1, movingTopLeftX + dx);
+
+      // Step from old place (the lower side), subtract it.
+      PixelType diff2 =
+        (*fixedImage)(fixedTopLeftY + patchSide - 1, fixedTopLeftX + dx) -
+        (*movingImage)(movingTopLeftY + patchSide - 1, movingTopLeftX + dx);
+
+      value += (diff1 * diff1 - diff2 * diff2);
+    }
+    --fixedTopLeftY;
+    --movingTopLeftY;
+  } else {
+    calculated = false;
+  }
+
   return calculated;
 }
 
@@ -331,6 +353,29 @@ template <class DatabaseType>
 bool SSD<DatabaseType>::ShiftDown()
 {
   assert(calculated && "Shifting invalid SSD object!");
+
+  // Boundary checks.
+  if (fixedTopLeftY + 1 + patchSide <= imageHeight &&
+      movingTopLeftY + 1 + patchSide <= imageHeight) {
+    for (size_t dx = 0; dx < patchSide; ++dx) {
+      // Step to new place (1 px down the lower side), add it.
+      PixelType diff1 =
+        (*fixedImage)(fixedTopLeftY + patchSide, fixedTopLeftX + dx) -
+        (*movingImage)(movingTopLeftY + patchSide, movingTopLeftX + dx);
+
+      // Step from old place (upper side), subtract it.
+      PixelType diff2 =
+        (*fixedImage)(fixedTopLeftY, fixedTopLeftX + dx) -
+        (*movingImage)(movingTopLeftY, movingTopLeftX + dx);
+
+      value += (diff1 * diff1 - diff2 * diff2);
+    }
+    ++fixedTopLeftY;
+    ++movingTopLeftY;
+  } else {
+    calculated = false;
+  }
+
   return calculated;
 }
 

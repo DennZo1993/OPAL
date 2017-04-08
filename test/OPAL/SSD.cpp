@@ -125,6 +125,19 @@ TEST_F(SSDShiftTest, ShiftRight1) {
 }
 
 
+TEST_F(SSDShiftTest, ShiftRight2) {
+  SSD<DatabaseType> ssd(db, /*idx=*/ 1, /*fix*/2, 3,/*mov*/1, 1, /*radius=*/ 1);
+
+  ASSERT_EQ(9, ssd.GetValue());
+
+  ssd.ShiftRight();
+  ASSERT_EQ(9, ssd.GetValue());
+
+  ssd.ShiftRight();
+  ASSERT_FALSE(ssd);
+}
+
+
 TEST_F(SSDShiftTest, ShiftLeft1) {
   SSD<DatabaseType> ssd(db, /*idx=*/ 1, /*fix*/2, 2,/*mov*/2, 2, /*radius=*/ 2);
 
@@ -167,7 +180,7 @@ TEST_F(IBSRTest, ShiftRight) {
     size_t fixY = 10 + run * 10;
     size_t radius = run;
     // ... and select some columns...
-    for (size_t fixX = 10; fixX < 200; fixX += 10) {
+    for (size_t fixX = radius+1; fixX < 200; fixX += 10) {
       size_t movX = fixX + 15;
       size_t movY = fixY + 25;
 
@@ -189,7 +202,7 @@ TEST_F(IBSRTest, ShiftLeft) {
     size_t fixY = 10 + run * 10;
     size_t radius = run;
     // ... and select some columns...
-    for (size_t fixX = 10; fixX < 200; fixX += 10) {
+    for (size_t fixX = radius; fixX < 200; fixX += 10) {
       size_t movX = fixX + 15;
       size_t movY = fixY + 25;
 
@@ -197,6 +210,50 @@ TEST_F(IBSRTest, ShiftLeft) {
       SSD<DatabaseType> trueSSD(ibsr, run, fixX, fixY, movX, movY, radius);
       SSD<DatabaseType> shiftSSD(ibsr, run, fixX+1, fixY, movX+1, movY, radius);
       shiftSSD.ShiftLeft();
+
+      ASSERT_EQ(trueSSD.GetValue(), shiftSSD.GetValue());
+    }
+  }
+}
+
+
+TEST_F(IBSRTest, ShiftUp) {
+  // Let us perform some runs...
+  for (size_t run = 1; run < 10; ++run) {
+    // ... for each run fix the row...
+    size_t fixX = 10 + run * 10;
+    size_t radius = run;
+    // ... and select some columns...
+    for (size_t fixY = radius; fixY < 200; fixY += 10) {
+      size_t movX = fixX + 15;
+      size_t movY = fixY + 25;
+
+      // ... and perform the checks.
+      SSD<DatabaseType> trueSSD(ibsr, run, fixX, fixY, movX, movY, radius);
+      SSD<DatabaseType> shiftSSD(ibsr, run, fixX, fixY+1, movX, movY+1, radius);
+      shiftSSD.ShiftUp();
+
+      ASSERT_EQ(trueSSD.GetValue(), shiftSSD.GetValue());
+    }
+  }
+}
+
+
+TEST_F(IBSRTest, ShiftDown) {
+  // Let us perform some runs...
+  for (size_t run = 1; run < 10; ++run) {
+    // ... for each run fix the row...
+    size_t fixX = 10 + run * 10;
+    size_t radius = run;
+    // ... and select some columns...
+    for (size_t fixY = radius+1; fixY < 200; fixY += 10) {
+      size_t movX = fixX + 15;
+      size_t movY = fixY + 25;
+
+      // ... and perform the checks.
+      SSD<DatabaseType> trueSSD(ibsr, run, fixX, fixY, movX, movY, radius);
+      SSD<DatabaseType> shiftSSD(ibsr, run, fixX, fixY-1, movX, movY-1, radius);
+      shiftSSD.ShiftDown();
 
       ASSERT_EQ(trueSSD.GetValue(), shiftSSD.GetValue());
     }
