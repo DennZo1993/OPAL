@@ -125,6 +125,17 @@ TEST_F(SSDShiftTest, ShiftRight1) {
 }
 
 
+TEST_F(SSDShiftTest, ShiftLeft1) {
+  SSD<DatabaseType> ssd(db, /*idx=*/ 1, /*fix*/2, 2,/*mov*/2, 2, /*radius=*/ 2);
+
+  ASSERT_EQ(25, ssd.GetValue());
+
+  // Nowhere to shift, radius = 2, image side = 5.
+  ssd.ShiftLeft();
+  ASSERT_FALSE(ssd);
+}
+
+
 class IBSRTest : public ::testing::Test {
 protected:
   using DatabaseType = ImageDatabase<int, int>;
@@ -164,6 +175,28 @@ TEST_F(IBSRTest, ShiftRight) {
       SSD<DatabaseType> trueSSD(ibsr, run, fixX, fixY, movX, movY, radius);
       SSD<DatabaseType> shiftSSD(ibsr, run, fixX-1, fixY, movX-1, movY, radius);
       shiftSSD.ShiftRight();
+
+      ASSERT_EQ(trueSSD.GetValue(), shiftSSD.GetValue());
+    }
+  }
+}
+
+
+TEST_F(IBSRTest, ShiftLeft) {
+  // Let us perform some runs...
+  for (size_t run = 1; run < 10; ++run) {
+    // ... for each run fix the row...
+    size_t fixY = 10 + run * 10;
+    size_t radius = run;
+    // ... and select some columns...
+    for (size_t fixX = 10; fixX < 200; fixX += 10) {
+      size_t movX = fixX + 15;
+      size_t movY = fixY + 25;
+
+      // ... and perform the checks.
+      SSD<DatabaseType> trueSSD(ibsr, run, fixX, fixY, movX, movY, radius);
+      SSD<DatabaseType> shiftSSD(ibsr, run, fixX+1, fixY, movX+1, movY, radius);
+      shiftSSD.ShiftLeft();
 
       ASSERT_EQ(trueSSD.GetValue(), shiftSSD.GetValue());
     }

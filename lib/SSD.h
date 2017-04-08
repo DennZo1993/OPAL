@@ -263,13 +263,16 @@ bool SSD<DatabaseType>::ShiftRight()
 {
   assert(calculated && "Shifting invalid SSD object!");
 
+  // Boundaries checks.
   if (fixedTopLeftX + 1 + patchSide <= imageWidth &&
       movingTopLeftX + 1 + patchSide <= imageWidth) {
     for (size_t dy = 0; dy < patchSide; ++dy) {
+      // Step to new place (1 px right the right side), add it.
       PixelType diff1 =
         (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX + patchSide) -
         (*movingImage)(movingTopLeftY + dy, movingTopLeftX + patchSide);
 
+      // Step from old place, subtract it (the left side).
       PixelType diff2 =
         (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX) -
         (*movingImage)(movingTopLeftY + dy, movingTopLeftX);
@@ -290,6 +293,28 @@ template <class DatabaseType>
 bool SSD<DatabaseType>::ShiftLeft()
 {
   assert(calculated && "Shifting invalid SSD object!");
+
+  // Boundaries checks.
+  if (fixedTopLeftX > 0 && movingTopLeftX > 0) {
+    for (size_t dy = 0; dy < patchSide; ++dy) {
+      // Step to new place (1 px left the left side), add it.
+      PixelType diff1 =
+        (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX - 1) -
+        (*movingImage)(movingTopLeftY + dy, movingTopLeftX - 1);
+
+      // Step from old place, subtract it (the right side).
+      PixelType diff2 =
+        (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX + patchSide - 1) -
+        (*movingImage)(movingTopLeftY + dy, movingTopLeftX + patchSide - 1);
+
+      value += (diff1 * diff1 - diff2 * diff2);
+    }
+    --fixedTopLeftX;
+    --movingTopLeftX;
+  } else {
+    calculated = false;
+  }
+
   return calculated;
 }
 
