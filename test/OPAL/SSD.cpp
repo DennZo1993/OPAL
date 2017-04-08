@@ -6,33 +6,33 @@
 // into #ifndef NDEBUG guards.
 
 
-// Global image database (IBSR).
-using DatabaseType = ImageDatabase<double, int>;
-DatabaseType ibsr;
-
-
 class SSDShiftTest : public ::testing::Test {
 protected:
   using DatabaseType = ImageDatabase<int, int>;
   using TImage = typename DatabaseType::ImageType;
 
-  virtual void SetUp() {
+  static void SetUpTestCase() {
     db.Add(TImage(HEIGHT, WIDTH, 1), TImage(HEIGHT, WIDTH, 0)); // Fixed.
     db.Add(TImage(HEIGHT, WIDTH, 2), TImage(HEIGHT, WIDTH, 0)); // Moving.
     db.Add(TImage(HEIGHT, WIDTH, 3), TImage(HEIGHT, WIDTH, 0)); // Moving.
     db.Add(TImage(HEIGHT, WIDTH, 4), TImage(HEIGHT, WIDTH, 0)); // Moving.
   }
 
+  virtual void SetUp() {}
+
   virtual void TearDown() {}
 
-  DatabaseType db;
+  static DatabaseType db;
   static constexpr size_t HEIGHT = 5;
   static constexpr size_t WIDTH = 5;
 };
 
 
+SSDShiftTest::DatabaseType SSDShiftTest::db;
+
+
 TEST_F(SSDShiftTest, ConstructionBad1) {
-  auto creator = [this]() {
+  auto creator = []() {
     SSD<DatabaseType> ssd(db, /*idx*/1, /*fix*/2, 2, /*mov*/1, 3, /*radius*/2);
   };
 
@@ -122,4 +122,50 @@ TEST_F(SSDShiftTest, ShiftRight1) {
 
   ssd.ShiftRight();
   ASSERT_FALSE(ssd);
+}
+
+
+class IBSRTest : public ::testing::Test {
+protected:
+  using DatabaseType = ImageDatabase<int, int>;
+
+  static void SetUpTestCase() {
+    ibsr.ReadFromConfig("test_data/IBSR.json");
+  }
+
+  virtual void SetUp() {}
+
+  virtual void TearDown() {}
+
+  static DatabaseType ibsr;
+};
+
+// 256 x 256 images.
+IBSRTest::DatabaseType IBSRTest::ibsr;
+
+// Tests below use some 'magic' numbers, which don't need to have these
+// particular values. The intention is to perform multiple comparisons
+// between 'truly calculated' SSD with values acquired after ShiftXXX at
+// different coordinates and images.
+
+
+TEST_F(IBSRTest, ShiftRight) {
+  // Let us perform some runs...
+  for (size_t run = 1; run < 10; ++run) {
+    // ... for each run fix the row...
+    size_t fixY = 10 + run * 10;
+    size_t radius = run;
+    // ... and select some columns...
+    for (size_t fixX = 10; fixX < 200; fixX += 10) {
+      size_t movX = fixX + 15;
+      size_t movY = fixY + 25;
+
+      // ... and perform the checks.
+      SSD<DatabaseType> trueSSD(ibsr, run, fixX, fixY, movX, movY, radius);
+      SSD<DatabaseType> shiftSSD(ibsr, run, fixX-1, fixY, movX-1, movY, radius);
+      shiftSSD.ShiftRight();
+
+      ASSERT_EQ(trueSSD.GetValue(), shiftSSD.GetValue());
+    }
+  }
 }
