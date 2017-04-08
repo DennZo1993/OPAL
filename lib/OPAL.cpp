@@ -122,14 +122,6 @@ int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
   SSDType vertical   = SSDMap(i + delta, j);
   SSDType horizontal = SSDMap(i, j + delta);
 
-#ifdef DUMP
-  std::cout << " --- current --- " << std::endl;
-  std::cout << current << std::endl;
-  std::cout << " --- vertical --- " << std::endl;
-  std::cout << vertical << std::endl;
-  std::cout << " --- horizontal --- " << std::endl;
-  std::cout << horizontal << std::endl;
-#endif
   if (current < vertical && current < horizontal)
     return 0;
 
@@ -143,23 +135,12 @@ int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
     fromHorizontal.ShiftRight();
   }
 
-#ifdef DUMP
-  std::cout << " --- from vertical --- " << std::endl;
-  std::cout << fromVertical << std::endl;
-  std::cout << " --- from horizontal --- " << std::endl;
-  std::cout << fromHorizontal << std::endl;
-
-
-  getchar();
-#endif
   if (fromVertical < current && fromVertical < fromHorizontal) {
     FieldX(i, j) = FieldX(i + delta, j);
     FieldY(i, j) = FieldY(i + delta, j);
     FieldT(i, j) = FieldT(i + delta, j);
     SSDMap(i, j) = fromVertical;
-#ifdef DUMP
-    std::cout << " VERTICAL " << std::endl;
-#endif
+
     return 1;
   }
 
@@ -169,16 +150,9 @@ int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
     FieldT(i, j) = FieldT(i, j + delta);
     SSDMap(i, j) = fromHorizontal;
 
-#ifdef DUMP
-    std::cout << " HORIZONTAL " << std::endl;
-#endif
     return 1;
   }
 
-#ifdef DUMP
-  std::cout << " ------------------------- " << std::endl;
-  std::cout << " ----- ITERATION END ----- " << std::endl;
-#endif
   return 0;
 }
 
