@@ -69,14 +69,13 @@ include_directories("${source_dir}/include")
 SET(TEST_SOURCES main.cpp
                  Common.cpp
 
-                 Matrix/Constructors.cpp
-                 Matrix/Allocation.cpp
-                 #Matrix/Read.cpp
-                 #Matrix/Write.cpp
-                 Matrix/Misc.cpp
-                 Matrix/AdditionSubtraction.cpp
-                 Matrix/Relation.cpp
-                 Matrix/Assign.cpp
+                 Image/Constructors.cpp
+                 Image/Allocation.cpp
+                 Image/Misc.cpp
+                 Image/AdditionSubtraction.cpp
+                 Image/Relation.cpp
+                 Image/Assign.cpp
+                 Image/StreamIO.cpp
 
                  ImageDatabaseTests.cpp
 
