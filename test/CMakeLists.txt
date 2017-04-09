@@ -1,9 +1,10 @@
 find_package(Threads REQUIRED)
 
+include(AddFlagIfSupported)
+include(GetCoverageFlags)
+
 # Enable ExternalProject CMake module
 include(ExternalProject)
-
-SET(CMAKE_BUILD_TYPE Debug)
 
 if (MSVC)
   set(LibSuffix ".lib")
@@ -64,13 +65,6 @@ set_target_properties(libgmock PROPERTIES
 # I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
 include_directories("${source_dir}/include")
 
-if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
-    ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU"))
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0") # debug, no optimisation
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage") # enabling coverage
-endif()
-
 # Testing project
 SET(TEST_SOURCES main.cpp
                  Common.cpp
@@ -99,12 +93,29 @@ SET(TEST_SOURCES main.cpp
                  util/JsonTest.cpp
     )
 
+# Compiler flags.
+add_flag_if_supported("-std=c++11"  TARGET_COMPILER_FLAGS)
+
+# Linker flags.
+set(TARGET_LINKER_FLAGS "")
+
+
 ADD_EXECUTABLE(Tests ${TEST_SOURCES})
+
+target_compile_options(Tests PRIVATE ${TARGET_COMPILER_FLAGS})
+
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
+  get_coverage_flags(COVERAGE_COMPILER_FLAGS)
+  target_compile_options(Tests PRIVATE ${COVERAGE_COMPILER_FLAGS})
+
+  list(APPEND TARGET_LINKER_FLAGS "-lgcov" "--coverage")
+endif()
 
 TARGET_LINK_LIBRARIES(Tests
     libOPAL
     libgtest
     libgmock
+    ${TARGET_LINKER_FLAGS}
 )
 
 add_custom_command(TARGET Tests PRE_BUILD

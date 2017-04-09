@@ -47,7 +47,7 @@ TEST(ImageDatabaseTests, TestLoadPNGImageAndPixels) {
   ASSERT_TRUE(ImageHasSize(seg, 4, 5));
 
   // Check that image is converted to gray-scale.
-  for (int j = 0; j < img.getWidth(); ++j) {
+  for (size_t j = 0; j < img.getWidth(); ++j) {
     // First row - black.
     ASSERT_DOUBLE_EQ(0.0, img(0, j));
     ASSERT_EQ(0, seg(0, j));

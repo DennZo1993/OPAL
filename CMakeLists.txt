@@ -2,14 +2,18 @@ cmake_minimum_required(VERSION 3.0)
 
 project(OPAL)
 
-if (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR
-    ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU"))
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
+  if (NOT UNIX)
+    message(FATAL_ERROR "Coverage analysis is only enabled on Unix-systems!")
+  endif()
 endif()
+
+# Include our CMake functions.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 enable_testing()
 
+add_subdirectory(lib)
 add_subdirectory(main)
 add_subdirectory(test)
-add_subdirectory(lib)
 #add_subdirectory(tools/flow2color)

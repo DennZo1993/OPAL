@@ -13,7 +13,7 @@ matrix:
             - g++-4.9
             - cmake
             - cmake-data
-      env: C_COMPILER=gcc-4.9 CXX_COMPILER=g++-4.9 GTEST_COLOR=1
+      env: C_COMPILER=gcc-4.9 CXX_COMPILER=g++-4.9 GTEST_COLOR=1 BUILD_TYPE=Release
 
     - compiler: gcc
       addons:
@@ -26,7 +26,7 @@ matrix:
             - g++-5
             - cmake
             - cmake-data
-      env: C_COMPILER=gcc-5 CXX_COMPILER=g++-5 GTEST_COLOR=1 LCOV="lcov-1.12/bin/lcov"
+      env: C_COMPILER=gcc-5 CXX_COMPILER=g++-5 GTEST_COLOR=1 LCOV="lcov-1.12/bin/lcov" BUILD_TYPE=Coverage
 
     - compiler: clang
       addons:
@@ -39,7 +39,7 @@ matrix:
             - clang-3.8
             - cmake
             - cmake-data
-      env: C_COMPILER=clang-3.8 CXX_COMPILER=clang++-3.8 GTEST_COLOR=1
+      env: C_COMPILER=clang-3.8 CXX_COMPILER=clang++-3.8 GTEST_COLOR=1 BUILD_TYPE=Release
 
 install:
   - |
@@ -55,13 +55,13 @@ install:
 
 script:
   - cd ${TRAVIS_BUILD_DIR}
-  - cmake -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_BUILD_TYPE=DEBUG .
+  - cmake -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE .
   - make CC=$C_COMPILER CXX=$CXX_COMPILER
   - ctest --verbose
 
 after_success:
   - |
-    if [[ "$CXX_COMPILER" == "g++-5" ]]; then
+    if [[ "$BUILD_TYPE" == "Coverage" ]]; then
       cd ${TRAVIS_BUILD_DIR}
       $LCOV --gcov-tool gcov-5 --directory . --capture --output-file coverage.info
       $LCOV --gcov-tool gcov-5 --remove coverage.info 'test/*' '/usr/*' '/gtest/*' --output-file coverage.info
