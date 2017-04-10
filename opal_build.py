@@ -24,7 +24,7 @@ def parse_args():
                       help='Run tests after successful build')
 
   parser.add_argument('-c', '--compiler',
-                      default='clang++',
+                      default=None,
                       help='C++ compiler to use')
 
   parser.add_argument('--cov',
