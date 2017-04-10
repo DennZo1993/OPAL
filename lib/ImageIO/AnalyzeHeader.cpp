@@ -1,5 +1,7 @@
 #include "AnalyzeHeader.h"
 
+#include <stdexcept>
+
 
 template <class ToCheck,
           std::size_t ExpectedSize, std::size_t RealSize = sizeof(ToCheck)>
@@ -28,10 +30,11 @@ AnalyzeFileHeader::AnalyzeFileHeader(FILE *f) {
 
 void AnalyzeFileHeader::ReadFromFile(FILE *f) {
   if (!f)
-    return;
+    throw std::runtime_error("Failed to read Analyze header: FILE* is null");
+
   auto elems = fread(&data, sizeof(Data), 1, f);
   if (elems != 1)
-    std::cout << "Read " << elems << " of 1 expected elements!" << std::endl;
+    throw std::runtime_error("Failed to read Analyze header");
 }
 
 

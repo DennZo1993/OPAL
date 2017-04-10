@@ -85,6 +85,7 @@ SET(TEST_SOURCES main.cpp
                  OPAL/SSD.cpp
 
                  ImageIO/AnalyzeImageReaderTest.cpp
+                 ImageIO/AnalyzeHeaderTest.cpp
                  ImageIO/PngImageReaderTest.cpp
 
                  util/FileTest.cpp

@@ -25,3 +25,8 @@ TEST(AnalyzeImageReader, ReadBadNoHeader) {
   ASSERT_THROW(reader.Read(), std::runtime_error);
 }
 
+
+TEST(AnalyzeImageReader, ReadBadNoImg) {
+  AnalyzeImageReader<int> reader("test_data/02.hdr");
+  ASSERT_THROW(reader.Read(), std::runtime_error);
+}
