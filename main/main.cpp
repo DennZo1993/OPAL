@@ -57,8 +57,8 @@ int main(int argc, char **argv) {
   double timeConsumed = double(clocksAfter - clocksBefore) / double(CLOCKS_PER_SEC);
 
   auto seg = opal.GetOutput();
-  auto groundTruth = ImageIO::ReadImage<OPAL::SegmentationPixelType>(argv[3]);
-  
+  auto groundTruth = ImageIO::ReadImage<OPAL::SegPixelType>(argv[3]);
+
   ImageIO::SegmentationColorsConverter converter;
 
   auto rgbResult = converter.ConvertToRGB(db.GetImage(0), seg);
@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
 
   ImageIO::WriteImage(rgbResult, resultDir + "/result.png");
   ImageIO::WriteImage(rgbGT, resultDir + "/ground_truth.png");
-  
-  SegmentationAccuracyEstimator<OPAL::SegmentationPixelType> estimator;
+
+  SegmentationAccuracyEstimator<OPAL::SegPixelType> estimator;
   estimator.Estimate(groundTruth, seg);
 
   auto diceMap = estimator.GetDiceScoreMap();

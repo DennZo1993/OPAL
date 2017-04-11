@@ -34,12 +34,12 @@
 class OPAL {
 public:
   // Fixed types.
-  using ImagePixelType        = double;
-  using SegmentationPixelType = int;
-  using DatabaseType     = ImageDatabase<ImagePixelType, SegmentationPixelType>;
-  using ImageType        = DatabaseType::ImageType;
-  using SegmentationType = DatabaseType::SegmentationType;
-  using SSDType          = SSDObject<ImagePixelType>;
+  using ImgPixelType = double;
+  using SegPixelType = int;
+  using DatabaseType = ImageDatabase<ImgPixelType, SegPixelType>;
+  using ImgType      = DatabaseType::ImgType;
+  using SegType      = DatabaseType::SegType;
+  using SSDType      = SSDObject<ImgPixelType>;
 
   /**
    * @param [in] settings Set of OPAL options.
@@ -77,7 +77,7 @@ public:
 
 
   /// @return The result segmentation of input image.
-  Image<SegmentationPixelType> GetOutput() const {
+  SegType GetOutput() const {
     return OutputSegmentation;
   }
 
@@ -125,10 +125,10 @@ private:
    * If offsetX = FieldX[i][j], offsetY = FieldY[i][j], T = FieldT[i][j],
    * then InputImage[i][j] = Database.getImage(T)[i+offsetY][j + offsetX]
    */
-  Image<ImagePixelType> InputImage;
+  ImgType InputImage;
 
   /// Result segmentation of input image.
-  Image<SegmentationPixelType> OutputSegmentation;
+  SegType OutputSegmentation;
 
 
   using RandomGeneratorType = std::mt19937;
@@ -137,8 +137,7 @@ private:
   RandomGeneratorType randGen;
 
 
-  using FinalLabelEstimator = MaxVoteLabelEstimator<SegmentationPixelType>;
-  //using FinalLabelEstimator = DummyLabelEstimator<SegmentationPixelType>;
+  using FinalLabelEstimator      = DummyLabelEstimator<SegPixelType>;
   using CandidateLabelsContainer = FinalLabelEstimator::CandidateContainer;
   FinalLabelEstimator finalLabelEstimator;
 

@@ -9,7 +9,7 @@
 class SSDShiftTest : public ::testing::Test {
 protected:
   using DatabaseType = ImageDatabase<int, int>;
-  using TImage = typename DatabaseType::ImageType;
+  using TImage = typename DatabaseType::ImgType;
 
   static void SetUpTestCase() {
     db.Add(TImage(HEIGHT, WIDTH, 1), TImage(HEIGHT, WIDTH, 0)); // Fixed.

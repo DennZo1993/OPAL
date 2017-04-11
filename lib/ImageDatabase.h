@@ -18,34 +18,25 @@ template<class I, class S>
 class ImageDatabase {
 
 public:
-  using ImagePixelType        = I;
-  using SegmentationPixelType = S;
+  using ImgPixelType = I;
+  using SegPixelType = S;
 
-  using ImageType        = Image<ImagePixelType>;
-  using SegmentationType = Image<SegmentationPixelType>;
+  using ImgType = Image<ImgPixelType>;
+  using SegType = Image<SegPixelType>;
 
-  template<class T>
-  struct FileImage {
-    std::string name;
-    Image<T> image;
-  };
-
-  using FileImageType        = FileImage<ImagePixelType>;
-  using FileSegmentationType = FileImage<SegmentationPixelType>;
-
-
+public:
   ImageDatabase() = default;
 
 public:
   /**
    * @brief Adds a pair of image and its segmentation. Reads both from files.
    *
-   * @param [in] imageFileName Name of image file.
+   * @param [in] imgFileName Name of image file.
    * @param [in] segFileName Name of segmentation file.
    *
    * @throws std::runtime_error.
    */
-  void Add(const std::string &imageFileName, const std::string &segFileName);
+  void Add(const std::string &imgFileName, const std::string &segFileName);
 
   /**
    * @brief Adds a pair "image, its segmentation" without reading files from
@@ -59,38 +50,52 @@ public:
    *
    * @param [in] imgMat Image.
    * @param [in] segMat Segmentation.
-   * @param [in] imageFileName Name of image file (optional).
+   * @param [in] imgFileName Name of image file (optional).
    * @param [in] segFileName Name of segmentation file (optional).
    *
    * @throws std::runtime_error.
    */
-  void Add(const ImageType &imgMat,
-           const SegmentationType &segMat,
-           const std::string &imageFileName = "",
+  void Add(const ImgType &imgMat, const SegType &segMat,
+           const std::string &imgFileName = "",
            const std::string &segFileName = "");
 
   // Read a JSON config file and fill the database accordingly.
   void ReadFromConfig(const std::string &fileName);
 
-  // Read a list of filenames as 'image, segmentation' pairs and add them.
-  // Doesn't clear the database before execution, adds images to existing ones.
-  //
-  // Throws std iostream excetions, std::runtime_error.
+  /**
+   * @brief Read a list of filenames as 'image, segmentation' pairs and add them
+   * to the database.
+   *
+   * Doesn't clear the database before execution, adds images to existing ones.
+   *
+   * @param [in] fileName Name of config file.
+   *
+   * @throws std iostream excetions, std::runtime_error.
+   */
   void AppendFilesFromList(const std::string &fileName);
 
-  // Clear the database and read from list.
-  //
-  // Throws std iostream excetions, std::runtime_error.
+  /**
+   * @brief Clear the database and read from list.
+   *
+   * See AppendFilesFromList.
+   *
+   * @param [in] fileName Name of config file.
+   *
+   * @throws std iostream excetions, std::runtime_error.
+   */
   void ReadFilesFromList(const std::string &fileName);
 
-  // Clear the contents of the database.
+  /// @brief Clear the contents of the database.
   void Clear();
 
   // Getters.
 
   // Get images.
-  inline const ImageType        & GetImage(size_t i)        const;
-  inline const SegmentationType & GetSegmentation(size_t i) const;
+  inline const ImgType & GetImage(size_t i)        const;
+  inline const SegType & GetSegmentation(size_t i) const;
+
+  inline std::string GetImageName(size_t i)        const;
+  inline std::string GetSegmentationName(size_t j) const;
 
   inline size_t GetImageCount() const;
   inline bool   IsEmpty()       const;
@@ -111,8 +116,11 @@ private:
                           std::vector<std::string> &absFiles);
 
 private:
-  std::vector<FileImageType>        images;
-  std::vector<FileSegmentationType> segmentations;
+  std::vector<ImgType> images;
+  std::vector<SegType> segmentations;
+
+  std::vector<std::string> imgNames;
+  std::vector<std::string> segNames;
 
   size_t imageHeight;
   size_t imageWidth;
@@ -122,20 +130,20 @@ private:
 
 
 template<class I, class S>
-void ImageDatabase<I, S>::Add(const std::string &imageFileName,
+void ImageDatabase<I, S>::Add(const std::string &imgFileName,
                               const std::string &segFileName)
 {
-  auto imgMat = ImageIO::ReadImage<ImagePixelType>(imageFileName);
-  auto segMat = ImageIO::ReadImage<SegmentationPixelType>(segFileName);
+  auto imgMat = ImageIO::ReadImage<ImgPixelType>(imgFileName);
+  auto segMat = ImageIO::ReadImage<SegPixelType>(segFileName);
 
-  Add(imgMat, segMat, imageFileName, segFileName);
+  Add(imgMat, segMat, imgFileName, segFileName);
 }
 
 
 template <class I, class S>
-void ImageDatabase<I, S>::Add(const ImageType &imgMat,
-                              const SegmentationType &segMat,
-                              const std::string &imageFileName,
+void ImageDatabase<I, S>::Add(const ImgType &imgMat,
+                              const SegType &segMat,
+                              const std::string &imgFileName,
                               const std::string &segFileName)
 {
   // Don't add empty images.
@@ -162,8 +170,13 @@ void ImageDatabase<I, S>::Add(const ImageType &imgMat,
         "Size of new image/segmentation doesn't suit the database!");
   }
 
-  images.push_back({imageFileName, imgMat});
-  segmentations.push_back({segFileName, segMat});
+  // Add images.
+  images.push_back(imgMat);
+  segmentations.push_back(segMat);
+
+  // Add image names.
+  imgNames.push_back(imgFileName);
+  segNames.push_back(segFileName);
 }
 
 
@@ -257,11 +270,11 @@ void ImageDatabase<I, S>::AppendFilesFromList(const std::string &fileName)
 {
   std::ifstream ifs(fileName);
 
-  std::string imageFileName, segFileName;
-  while (ifs >> imageFileName) {
+  std::string imgFileName, segFileName;
+  while (ifs >> imgFileName) {
     if (!(ifs >> segFileName))
       break;
-    Add(imageFileName, segFileName);
+    Add(imgFileName, segFileName);
   }
   ifs.close();
 }
@@ -285,23 +298,37 @@ void ImageDatabase<I, S>::Clear()
 
 // Throws std::out_of_range.
 template<class I, class S>
-const typename ImageDatabase<I, S>::ImageType &
+const typename ImageDatabase<I, S>::ImgType &
 ImageDatabase<I, S>::GetImage(size_t i) const
 {
   assert(i < images.size() && "Image index is out of range!");
 
-  return images[i].image;
+  return images[i];
 }
 
 
 // Throws std::out_of_range.
 template<class I, class S>
-const typename ImageDatabase<I, S>::SegmentationType &
+const typename ImageDatabase<I, S>::SegType &
 ImageDatabase<I, S>::GetSegmentation(size_t i) const
 {
   assert(i < segmentations.size() && "Segmentation index is out of range!");
 
-  return segmentations[i].image;
+  return segmentations[i];
+}
+
+
+template <class I, class S>
+std::string ImageDatabase<I, S>::GetImageName(size_t i) const
+{
+  return imgNames[i];
+}
+
+
+template <class I, class S>
+std::string ImageDatabase<I, S>::GetSegmentationName(size_t i) const
+{
+  return segNames[i];
 }
 
 

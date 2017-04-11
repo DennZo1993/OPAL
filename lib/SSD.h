@@ -30,8 +30,8 @@
 template <class DatabaseType>
 class SSD {
 public:
-  using ImageType = typename DatabaseType::ImageType;
-  using PixelType = typename DatabaseType::ImagePixelType;
+  using ImageType = typename DatabaseType::ImgType;
+  using PixelType = typename DatabaseType::ImgPixelType;
 
 public:
   // Constructors and destructors.
