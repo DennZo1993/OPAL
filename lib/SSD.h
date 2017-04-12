@@ -30,7 +30,6 @@
 template <class DatabaseType>
 class SSD {
 public:
-  using ImageType = typename DatabaseType::ImgType;
   using PixelType = typename DatabaseType::ImgPixelType;
 
 public:
@@ -141,17 +140,14 @@ private:
   bool PatchInsideImage(const size_t x, const size_t y);
 
 private:
-  /// Database of images.
-  const DatabaseType &database;
+  /// Fixed image iterator. Doesn't move, always img_cbegin().
+  const typename DatabaseType::ConstImgIterator fixedImageIt;
 
-  /// Index of image in database. Must be >= 1.
-  size_t movingIndex;
+  /// Moving image iterator (img_cbegin() + movingIndex).
+  typename DatabaseType::ConstImgIterator movingImageIt;
 
-  /// Pointer to fixed image (database[0]).
-  const ImageType *fixedImage;
-
-  /// Pointer to moving image (database[movingIndex]).
-  const ImageType *movingImage;
+  /// Iterator pointing at the end of database.
+  typename DatabaseType::ConstImgIterator databaseEnd;
 
   /// Radius of patch (parameter).
   size_t patchRadius;
@@ -192,8 +188,9 @@ SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
                        size_t ctrFixedX, size_t ctrFixedY,
                        size_t ctrMovingX, size_t ctrMovingY,
                        size_t radius)
-  : database(db)
-  , movingIndex(idx)
+  : fixedImageIt(db.img_cbegin())
+  , movingImageIt(db.img_cbegin() + idx)
+  , databaseEnd(db.img_cend())
   , patchRadius(radius)
   , patchSide(2 * patchRadius + 1)
   , fixedTopLeftX(ctrFixedX - patchRadius)
@@ -203,12 +200,10 @@ SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
   , value(0)
   , calculated(false)
 {
-  assert(movingIndex > 0 && "SSD between patches of 0-th image in database!");
+  assert(idx > 0 && "SSD between patches of 0-th image in database!");
 
-  fixedImage  = &database.GetImage(0);
-  movingImage = &database.GetImage(movingIndex);
-  imageHeight = database.GetImageHeight();
-  imageWidth  = database.GetImageWidth();
+  imageHeight = db.GetImageHeight();
+  imageWidth  = db.GetImageWidth();
 
   // If we try to construct a new SSD, be sure we pass the correct arguments to
   // calculate it.
@@ -269,13 +264,13 @@ bool SSD<DatabaseType>::ShiftRight()
     for (size_t dy = 0; dy < patchSide; ++dy) {
       // Step to new place (1 px right the right side), add it.
       PixelType diff1 =
-        (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX + patchSide) -
-        (*movingImage)(movingTopLeftY + dy, movingTopLeftX + patchSide);
+        (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + patchSide) -
+        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + patchSide);
 
       // Step from old place, subtract it (the left side).
       PixelType diff2 =
-        (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX) -
-        (*movingImage)(movingTopLeftY + dy, movingTopLeftX);
+        (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX) -
+        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX);
 
       value += (diff1 * diff1 - diff2 * diff2);
     }
@@ -299,13 +294,13 @@ bool SSD<DatabaseType>::ShiftLeft()
     for (size_t dy = 0; dy < patchSide; ++dy) {
       // Step to new place (1 px left the left side), add it.
       PixelType diff1 =
-        (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX - 1) -
-        (*movingImage)(movingTopLeftY + dy, movingTopLeftX - 1);
+        (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX - 1) -
+        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX - 1);
 
       // Step from old place, subtract it (the right side).
       PixelType diff2 =
-        (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX + patchSide - 1) -
-        (*movingImage)(movingTopLeftY + dy, movingTopLeftX + patchSide - 1);
+        (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + patchSide - 1) -
+        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + patchSide - 1);
 
       value += (diff1 * diff1 - diff2 * diff2);
     }
@@ -329,13 +324,13 @@ bool SSD<DatabaseType>::ShiftUp()
     for (size_t dx = 0; dx < patchSide; ++dx) {
       // Step to new place (1 px up the upper side), add it.
       PixelType diff1 =
-        (*fixedImage)(fixedTopLeftY - 1, fixedTopLeftX + dx) -
-        (*movingImage)(movingTopLeftY - 1, movingTopLeftX + dx);
+        (*fixedImageIt)(fixedTopLeftY - 1, fixedTopLeftX + dx) -
+        (*movingImageIt)(movingTopLeftY - 1, movingTopLeftX + dx);
 
       // Step from old place (the lower side), subtract it.
       PixelType diff2 =
-        (*fixedImage)(fixedTopLeftY + patchSide - 1, fixedTopLeftX + dx) -
-        (*movingImage)(movingTopLeftY + patchSide - 1, movingTopLeftX + dx);
+        (*fixedImageIt)(fixedTopLeftY + patchSide - 1, fixedTopLeftX + dx) -
+        (*movingImageIt)(movingTopLeftY + patchSide - 1, movingTopLeftX + dx);
 
       value += (diff1 * diff1 - diff2 * diff2);
     }
@@ -360,13 +355,13 @@ bool SSD<DatabaseType>::ShiftDown()
     for (size_t dx = 0; dx < patchSide; ++dx) {
       // Step to new place (1 px down the lower side), add it.
       PixelType diff1 =
-        (*fixedImage)(fixedTopLeftY + patchSide, fixedTopLeftX + dx) -
-        (*movingImage)(movingTopLeftY + patchSide, movingTopLeftX + dx);
+        (*fixedImageIt)(fixedTopLeftY + patchSide, fixedTopLeftX + dx) -
+        (*movingImageIt)(movingTopLeftY + patchSide, movingTopLeftX + dx);
 
       // Step from old place (upper side), subtract it.
       PixelType diff2 =
-        (*fixedImage)(fixedTopLeftY, fixedTopLeftX + dx) -
-        (*movingImage)(movingTopLeftY, movingTopLeftX + dx);
+        (*fixedImageIt)(fixedTopLeftY, fixedTopLeftX + dx) -
+        (*movingImageIt)(movingTopLeftY, movingTopLeftX + dx);
 
       value += (diff1 * diff1 - diff2 * diff2);
     }
@@ -385,12 +380,12 @@ bool SSD<DatabaseType>::ShiftTop()
 {
   assert(calculated && "Shifting invalid SSD object!");
 
-  if (movingIndex < 2) {
+  // N. B. Here we rely on the fact that fixedImageIt NEVER moves!
+  if (movingImageIt == fixedImageIt + 1) {
     // We're already at database[1], cannot go up the base.
     calculated = false;
   } else {
-    --movingIndex;
-    movingImage = &database.GetImage(movingIndex);
+    --movingImageIt;
 
     CalculateValue();
   }
@@ -404,12 +399,11 @@ bool SSD<DatabaseType>::ShiftBottom()
 {
   assert(calculated && "Shifting invalid SSD object!");
 
-  if (movingIndex + 1 == database.GetImageCount()) {
+  if (movingImageIt + 1 == databaseEnd) {
     // We're at the last image in database, nowhere to go down.
     calculated = false;
   } else {
-    ++movingIndex;
-    movingImage = &database.GetImage(movingIndex);
+    ++movingImageIt;
 
     CalculateValue();
   }
@@ -424,8 +418,8 @@ void SSD<DatabaseType>::CalculateValue()
   value = 0;
   for (size_t dy = 0; dy < patchSide; ++dy)
     for (size_t dx = 0; dx < patchSide; ++dx) {
-      PixelType diff = (*fixedImage)(fixedTopLeftY + dy, fixedTopLeftX + dx) -
-                       (*movingImage)(movingTopLeftY + dy, movingTopLeftX + dx);
+      PixelType diff = (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + dx) -
+                       (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + dx);
       value += diff * diff;
     }
   calculated = true;
