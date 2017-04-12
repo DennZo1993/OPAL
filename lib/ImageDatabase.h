@@ -24,6 +24,12 @@ public:
   using ImgType = Image<ImgPixelType>;
   using SegType = Image<SegPixelType>;
 
+  using ImgContainerType = std::vector<ImgType>;
+  using SegContainerType = std::vector<SegType>;
+
+  using ConstImgIterator = typename ImgContainerType::const_iterator;
+  using ConstSegIterator = typename SegContainerType::const_iterator;
+
 public:
   ImageDatabase() = default;
 
@@ -104,6 +110,12 @@ public:
   size_t GetImageHeight() const { return imageHeight; }
   size_t GetImageWidth()  const { return imageWidth;  }
 
+  // Iterators.
+  inline ConstImgIterator img_cbegin() const { return images.cbegin(); }
+  inline ConstSegIterator seg_cbegin() const { return segmentations.cbegin(); }
+  inline ConstImgIterator img_cend()   const { return images.end(); }
+  inline ConstSegIterator seg_cend()   const { return segmentations.cend(); }
+
 private:
   void ReadFromJson(const util::Json &jsonConfig);
 
@@ -116,8 +128,8 @@ private:
                           std::vector<std::string> &absFiles);
 
 private:
-  std::vector<ImgType> images;
-  std::vector<SegType> segmentations;
+  ImgContainerType images;
+  SegContainerType segmentations;
 
   std::vector<std::string> imgNames;
   std::vector<std::string> segNames;
@@ -321,6 +333,8 @@ ImageDatabase<I, S>::GetSegmentation(size_t i) const
 template <class I, class S>
 std::string ImageDatabase<I, S>::GetImageName(size_t i) const
 {
+  assert(i < imgNames.size() && "Index of image name is out of range!");
+
   return imgNames[i];
 }
 
@@ -328,6 +342,8 @@ std::string ImageDatabase<I, S>::GetImageName(size_t i) const
 template <class I, class S>
 std::string ImageDatabase<I, S>::GetSegmentationName(size_t i) const
 {
+  assert(i < segNames.size() && "Index of segmentation name is out of range!");
+
   return segNames[i];
 }
 

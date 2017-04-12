@@ -70,3 +70,36 @@ TEST(ImageDatabaseTests, TestReadFromConfig) {
 
   ASSERT_EQ(17, db.GetImageCount());
 }
+
+
+TEST(ImageDatabaseTests, TestIterators1) {
+  ImageDatabase<double, int> db;
+
+  // Empty database
+  ASSERT_EQ(db.img_cbegin(), db.img_cend());
+  ASSERT_EQ(db.seg_cbegin(), db.seg_cend());
+}
+
+
+TEST(ImageDatabaseTests, TestIterators2) {
+  ImageDatabase<int, int> db;
+  ImageDatabase<int, int>::ImgType img(5, 2, 10);
+  ImageDatabase<int, int>::SegType seg(5, 2, 18);
+  db.Add(img, seg);
+
+  ASSERT_EQ(*(db.img_cbegin()), img);
+  ASSERT_EQ(*(db.seg_cbegin()), seg);
+}
+
+
+TEST(ImageDatabaseTests, TestIterators3) {
+  ImageDatabase<int, int> db;
+  ImageDatabase<int, int>::ImgType img(5, 2, 10);
+  ImageDatabase<int, int>::SegType seg(5, 2, 18);
+  db.Add(img, seg);
+
+  auto imgIt = db.img_cbegin();
+  auto segIt = db.seg_cbegin();
+  ASSERT_EQ(++imgIt, db.img_cend());
+  ASSERT_EQ(++segIt, db.seg_cend());
+}
