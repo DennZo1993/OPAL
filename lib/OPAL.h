@@ -11,7 +11,7 @@
 
 #include "ImageDatabase.h"
 #include "OPALSettings.h"
-#include "SSDObject.h"
+#include "SSD.h"
 #include "MaxVoteLabelEstimator.h"
 #include "DummyLabelEstimator.h"
 
@@ -39,7 +39,7 @@ public:
   using DatabaseType = ImageDatabase<ImgPixelType, SegPixelType>;
   using ImgType      = DatabaseType::ImgType;
   using SegType      = DatabaseType::SegType;
-  using SSDType      = SSDObject<ImgPixelType>;
+  using SSDType      = SSD<DatabaseType>;
 
   /**
    * @param [in] settings Set of OPAL options.

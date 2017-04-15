@@ -200,12 +200,12 @@ void OPAL::SaveCurrentFields(const std::string &fileName) const {
 
 
 OPAL::SSDType OPAL::SSDAt(size_t i, size_t j) const {
-  const auto &curDst = Database.GetImage(FieldT(i, j));
-  auto curX = j + FieldX(i, j);
-  auto curY = i + FieldY(i, j);
+  auto movIndex = FieldT(i, j);
+  auto movX = j + FieldX(i, j);
+  auto movY = i + FieldY(i, j);
 
-  return SSDType(&InputImage, i, j,
-                 &curDst, curY, curX,
+  return SSDType(Database, movIndex,
+                 j, i, movX, movY,
                  Sets.patchRadius);
 }
 

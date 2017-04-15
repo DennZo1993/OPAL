@@ -35,6 +35,8 @@ public:
 public:
   // Constructors and destructors.
 
+  SSD() = default;
+
   /**
    * @brief Constructor from coordinates of centers of patches.
    *
@@ -141,7 +143,7 @@ private:
 
 private:
   /// Fixed image iterator. Doesn't move, always img_cbegin().
-  const typename DatabaseType::ConstImgIterator fixedImageIt;
+  typename DatabaseType::ConstImgIterator fixedImageIt;
 
   /// Moving image iterator (img_cbegin() + movingIndex).
   typename DatabaseType::ConstImgIterator movingImageIt;
