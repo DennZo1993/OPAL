@@ -15,7 +15,7 @@ public:
 
   ~AnalyzeImageWriter() = default;
 
-  void SetHeader(const AnalyzeImageHeader &hdr) {
+  void SetHeader(const AnalyzeFileHeader &hdr) {
     header = hdr;
   }
 

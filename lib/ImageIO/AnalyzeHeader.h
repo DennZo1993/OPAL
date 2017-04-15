@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-namespace Analyze {
+namespace ImageIO {
 
 struct HeaderKey {
   int32_t SizeOfHeader;
@@ -86,4 +86,4 @@ private:
   Data data;
 };
 
-} // namespace Analyze
+} // namespace ImageIO

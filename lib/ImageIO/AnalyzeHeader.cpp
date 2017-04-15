@@ -10,7 +10,7 @@ static void CheckSize() {
 }
 
 
-namespace Analyze {
+namespace ImageIO {
 
 AnalyzeFileHeader::AnalyzeFileHeader() {
   CheckSize<HeaderKey, 40>();
@@ -108,4 +108,4 @@ const char* AnalyzeFileHeader::DecodeOrientation(char orient) {
 }
 
 
-} // namespace Analyze
+} // namespace ImageIO

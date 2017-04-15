@@ -10,7 +10,7 @@
 #pragma once
 
 #include <cassert>
-
+#include <cstddef>
 
 /**
  * @brief Class responsible for SSD calculation between patches of images.

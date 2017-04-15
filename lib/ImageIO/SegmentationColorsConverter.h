@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../RGBAPixel.h"
+#include "RGBAPixel.h"
+#include "Image.h"
 #include <map>
 #include <stdexcept>
 

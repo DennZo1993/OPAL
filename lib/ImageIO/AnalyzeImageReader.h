@@ -82,7 +82,7 @@ private:
   }
 
 private:
-  Analyze::AnalyzeFileHeader header;
+  AnalyzeFileHeader header;
 };
 
 } // namespace ImageIO
