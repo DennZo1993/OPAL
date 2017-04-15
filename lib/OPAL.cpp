@@ -226,7 +226,7 @@ void OPAL::GetCandidateLabelsForPixel(
   assert(j >= Sets.patchRadius && j + Sets.patchRadius < ImageWidth &&
          "index j is out of range!");
 
-  //constexpr double CANDIDATE_WEIGHT = 1.0;
+  constexpr double CANDIDATE_WEIGHT = 1.0;
 
   result.clear();
 
@@ -238,7 +238,6 @@ void OPAL::GetCandidateLabelsForPixel(
 
       const auto label = curDst(di + OffsetY, dj + OffsetX);
 
-      auto CANDIDATE_WEIGHT = 1.0 / SSDMap(di, dj).GetValue();
       result.push_back(std::make_pair(label, CANDIDATE_WEIGHT));
     }
 }
