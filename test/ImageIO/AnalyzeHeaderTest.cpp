@@ -4,7 +4,7 @@
 #include <sstream>
 
 
-using namespace Analyze;
+using namespace ImageIO;
 
 
 TEST(AnalyzeHeader, ConstructionDefault) {
