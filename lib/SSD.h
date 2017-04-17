@@ -30,7 +30,7 @@
 template <class DatabaseType>
 class SSD {
 public:
-  using PixelType = typename DatabaseType::ImgPixelType;
+  using ValueType = typename DatabaseType::ImgPixelType;
 
 public:
   // Constructors and destructors.
@@ -64,12 +64,12 @@ public:
   /**
    * @returns Value of calculated SSD.
    */
-  PixelType GetValue() const;
+  ValueType GetValue() const;
 
   /**
    * @returns Retult of GetValue().
    */
-  operator PixelType() const;
+  operator ValueType() const;
 
   /**
    * @todo Documentation.
@@ -84,42 +84,42 @@ public:
    *
    * @returns Calculated flag.
    */
-  PixelType ShiftRight();
+  ValueType ShiftRight();
 
   /**
    * @brief Same moving image, (x-1,y) on both fixed and moving images.
    *
    * @returns Calculated flag.
    */
-  PixelType ShiftLeft();
+  ValueType ShiftLeft();
 
   /**
    * @brief Same moving image, (x,y-1) on both fixed and moving images.
    *
    * @returns Calculated flag.
    */
-  PixelType ShiftUp();
+  ValueType ShiftUp();
 
   /**
    * @brief Same moving image, (x,y+1) on both fixed and moving images.
    *
    * @returns Calculated flag.
    */
-  PixelType ShiftDown();
+  ValueType ShiftDown();
 
   /**
    * @brief Same (x,y) coordinates on database[movingIndex - 1].
    *
    * @returns Calculated flag.
    */
-  PixelType ShiftTop();
+  ValueType ShiftTop();
 
   /**
    * @brief Same (x,y) coordinates on database[movingIndex + 1].
    *
    * @returns Calculated flag.
    */
-  PixelType ShiftBottom();
+  ValueType ShiftBottom();
 
 private:
 
@@ -171,7 +171,7 @@ private:
   size_t imageWidth;
 
   /// Cached SSD value.
-  PixelType value;
+  ValueType value;
 };
 
 
@@ -210,14 +210,14 @@ SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
 
 
 template <class DatabaseType>
-typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::GetValue() const
+typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::GetValue() const
 {
   return value;
 }
 
 
 template <class DatabaseType>
-SSD<DatabaseType>::operator PixelType() const
+SSD<DatabaseType>::operator ValueType() const
 {
   return GetValue();
 }
@@ -231,16 +231,16 @@ bool SSD<DatabaseType>::operator <(const SSD &other) const
 
 
 template <class DatabaseType>
-typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftRight()
+typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftRight()
 {
   for (size_t dy = 0; dy < patchSide; ++dy) {
     // Step to new place (1 px right the right side), add it.
-    PixelType diff1 =
+    ValueType diff1 =
       (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + patchSide) -
       (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + patchSide);
 
     // Step from old place, subtract it (the left side).
-    PixelType diff2 =
+    ValueType diff2 =
       (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX) -
       (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX);
 
@@ -254,16 +254,16 @@ typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftRight()
 
 
 template <class DatabaseType>
-typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftLeft()
+typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftLeft()
 {
   for (size_t dy = 0; dy < patchSide; ++dy) {
     // Step to new place (1 px left the left side), add it.
-    PixelType diff1 =
+    ValueType diff1 =
       (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX - 1) -
       (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX - 1);
 
     // Step from old place, subtract it (the right side).
-    PixelType diff2 =
+    ValueType diff2 =
       (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + patchSide - 1) -
       (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + patchSide - 1);
 
@@ -277,16 +277,16 @@ typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftLeft()
 
 
 template <class DatabaseType>
-typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftUp()
+typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftUp()
 {
   for (size_t dx = 0; dx < patchSide; ++dx) {
     // Step to new place (1 px up the upper side), add it.
-    PixelType diff1 =
+    ValueType diff1 =
       (*fixedImageIt)(fixedTopLeftY - 1, fixedTopLeftX + dx) -
       (*movingImageIt)(movingTopLeftY - 1, movingTopLeftX + dx);
 
     // Step from old place (the lower side), subtract it.
-    PixelType diff2 =
+    ValueType diff2 =
       (*fixedImageIt)(fixedTopLeftY + patchSide - 1, fixedTopLeftX + dx) -
       (*movingImageIt)(movingTopLeftY + patchSide - 1, movingTopLeftX + dx);
 
@@ -300,16 +300,16 @@ typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftUp()
 
 
 template <class DatabaseType>
-typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftDown()
+typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftDown()
 {
   for (size_t dx = 0; dx < patchSide; ++dx) {
     // Step to new place (1 px down the lower side), add it.
-    PixelType diff1 =
+    ValueType diff1 =
       (*fixedImageIt)(fixedTopLeftY + patchSide, fixedTopLeftX + dx) -
       (*movingImageIt)(movingTopLeftY + patchSide, movingTopLeftX + dx);
 
     // Step from old place (upper side), subtract it.
-    PixelType diff2 =
+    ValueType diff2 =
       (*fixedImageIt)(fixedTopLeftY, fixedTopLeftX + dx) -
       (*movingImageIt)(movingTopLeftY, movingTopLeftX + dx);
 
@@ -323,7 +323,7 @@ typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftDown()
 
 
 template <class DatabaseType>
-typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftTop()
+typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftTop()
 {
   --movingImageIt;
   CalculateValue();
@@ -333,7 +333,7 @@ typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftTop()
 
 
 template <class DatabaseType>
-typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftBottom()
+typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftBottom()
 {
   ++movingImageIt;
   CalculateValue();
@@ -348,7 +348,7 @@ void SSD<DatabaseType>::CalculateValue()
   value = 0;
   for (size_t dy = 0; dy < patchSide; ++dy)
     for (size_t dx = 0; dx < patchSide; ++dx) {
-      PixelType diff = (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + dx) -
+      ValueType diff = (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + dx) -
                        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + dx);
       value += diff * diff;
     }
