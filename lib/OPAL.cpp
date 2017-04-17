@@ -119,13 +119,11 @@ void OPAL::Propagation(size_t iteration) {
 
 //#define DUMP
 
+
 int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
   SSDType current    = SSDMap(i, j);
   SSDType vertical   = SSDMap(i + delta, j);
   SSDType horizontal = SSDMap(i, j + delta);
-
-  if (current < vertical && current < horizontal)
-    return 0;
 
   SSDType fromVertical = vertical;
   SSDType fromHorizontal = horizontal;
@@ -136,6 +134,9 @@ int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
     fromVertical.ShiftDown();
     fromHorizontal.ShiftRight();
   }
+
+  if (current < fromVertical && current < fromHorizontal)
+    return 0;
 
   if (fromVertical < current && fromVertical < fromHorizontal) {
     FieldX(i, j) = FieldX(i + delta, j);
