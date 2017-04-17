@@ -50,8 +50,10 @@ void OPAL::ConstrainedInitialization() {
 
   // (i, j) is mapped to (i+offsetY, j+offsetX) at Database[t].
   // Make sure we'll be able to consider a patch around destination loc.
-  int yUpperConstraint = ImageHeight - Sets.patchRadius - 1;
-  int xUpperConstraint = ImageWidth - Sets.patchRadius - 1;
+  int xLowerConstraint = Sets.patchRadius + 1;
+  int yLowerConstraint = Sets.patchRadius + 1;
+  int yUpperConstraint = ImageHeight - Sets.patchRadius - 2;
+  int xUpperConstraint = ImageWidth - Sets.patchRadius - 2;
 
   // Fill FieldX, FieldY, FieldT.
   for (int i = 0; i < static_cast<int>(ImageHeight); ++i) {
@@ -64,14 +66,14 @@ void OPAL::ConstrainedInitialization() {
       int offsetY = distX(randGen); // can use distX for y (same bounds).
 
       // y coordinate
-      if (i + offsetY < static_cast<int>(Sets.patchRadius))
-        offsetY = Sets.patchRadius - i; // (i, j) -> (patchRadius, ...)
+      if (i + offsetY < yLowerConstraint)
+        offsetY = yLowerConstraint - i; // (i, j) -> (patchRadius, ...)
       if (i + offsetY > yUpperConstraint)
         offsetY = yUpperConstraint - i;
 
       // x coordinate
-      if (j + offsetX < static_cast<int>(Sets.patchRadius))
-        offsetX = Sets.patchRadius - j;
+      if (j + offsetX < xLowerConstraint)
+        offsetX = xLowerConstraint - j;
       if (j + offsetX > xUpperConstraint)
         offsetX = xUpperConstraint - j;
 
@@ -91,11 +93,11 @@ void OPAL::ConstrainedInitialization() {
 
 
 void OPAL::Propagation(size_t iteration) {
-  size_t xStart = iteration % 2 ? ImageWidth - Sets.patchRadius - 1
+  size_t xStart = iteration % 2 ? ImageWidth - Sets.patchRadius - 2
                                 : Sets.patchRadius;
 
   size_t xEnd   = iteration % 2 ? Sets.patchRadius
-                                : ImageWidth - Sets.patchRadius - 1;
+                                : ImageWidth - Sets.patchRadius - 2;
 
   size_t yStart = iteration % 2 ? ImageHeight - Sets.patchRadius - 1
                                 : Sets.patchRadius;

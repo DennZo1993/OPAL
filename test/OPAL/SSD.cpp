@@ -47,10 +47,6 @@ TEST_F(SSDShiftTest, ShiftTop1) {
 
   ASSERT_TRUE(ssd);
   ASSERT_EQ(9, ssd.GetValue());
-
-  ssd.ShiftTop(); // Nowhere to shift, must be uncalculated.
-
-  ASSERT_FALSE(ssd);
 }
 
 
@@ -67,13 +63,6 @@ TEST_F(SSDShiftTest, ShiftTop2) {
   ssd.ShiftTop();
   ASSERT_TRUE(ssd);
   ASSERT_EQ(9, ssd.GetValue());
-
-  ssd.ShiftTop(); // Nowhere to shift.
-  ASSERT_FALSE(ssd);
-
-#ifndef NDEBUG
-  ASSERT_DEATH(ssd.ShiftBottom(), ".*"); // Cannot shift invalid SSD.
-#endif
 }
 
 
@@ -82,10 +71,6 @@ TEST_F(SSDShiftTest, ShiftBottom1) {
 
   ASSERT_TRUE(ssd);
   ASSERT_EQ(81, ssd.GetValue());
-
-  ssd.ShiftBottom(); // Nowhere to shift, must be uncalculated.
-
-  ASSERT_FALSE(ssd);
 }
 
 
@@ -102,13 +87,6 @@ TEST_F(SSDShiftTest, ShiftBottom2) {
   ssd.ShiftBottom();
   ASSERT_TRUE(ssd);
   ASSERT_EQ(81, ssd.GetValue());
-
-  ssd.ShiftBottom(); // Nowhere to shift.
-  ASSERT_FALSE(ssd);
-
-#ifndef NDEBUG
-  ASSERT_DEATH(ssd.ShiftTop(), ".*"); // Cannot shift invalid SSD.
-#endif
 }
 
 
@@ -119,9 +97,6 @@ TEST_F(SSDShiftTest, ShiftRight1) {
 
   ssd.ShiftRight();
   ASSERT_EQ(9, ssd.GetValue());
-
-  ssd.ShiftRight();
-  ASSERT_FALSE(ssd);
 }
 
 
@@ -132,9 +107,6 @@ TEST_F(SSDShiftTest, ShiftRight2) {
 
   ssd.ShiftRight();
   ASSERT_EQ(9, ssd.GetValue());
-
-  ssd.ShiftRight();
-  ASSERT_FALSE(ssd);
 }
 
 
@@ -142,10 +114,6 @@ TEST_F(SSDShiftTest, ShiftLeft1) {
   SSD<DatabaseType> ssd(db, /*idx=*/ 1, /*fix*/2, 2,/*mov*/2, 2, /*radius=*/ 2);
 
   ASSERT_EQ(25, ssd.GetValue());
-
-  // Nowhere to shift, radius = 2, image side = 5.
-  ssd.ShiftLeft();
-  ASSERT_FALSE(ssd);
 }
 
 

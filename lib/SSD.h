@@ -72,11 +72,6 @@ public:
   operator PixelType() const;
 
   /**
-   * @returns Calculated flag.
-   */
-  operator bool() const;
-
-  /**
    * @todo Documentation.
    */
   bool operator <(const SSD &other) const;
@@ -89,42 +84,42 @@ public:
    *
    * @returns Calculated flag.
    */
-  bool ShiftRight();
+  PixelType ShiftRight();
 
   /**
    * @brief Same moving image, (x-1,y) on both fixed and moving images.
    *
    * @returns Calculated flag.
    */
-  bool ShiftLeft();
+  PixelType ShiftLeft();
 
   /**
    * @brief Same moving image, (x,y-1) on both fixed and moving images.
    *
    * @returns Calculated flag.
    */
-  bool ShiftUp();
+  PixelType ShiftUp();
 
   /**
    * @brief Same moving image, (x,y+1) on both fixed and moving images.
    *
    * @returns Calculated flag.
    */
-  bool ShiftDown();
+  PixelType ShiftDown();
 
   /**
    * @brief Same (x,y) coordinates on database[movingIndex - 1].
    *
    * @returns Calculated flag.
    */
-  bool ShiftTop();
+  PixelType ShiftTop();
 
   /**
    * @brief Same (x,y) coordinates on database[movingIndex + 1].
    *
    * @returns Calculated flag.
    */
-  bool ShiftBottom();
+  PixelType ShiftBottom();
 
 private:
 
@@ -177,9 +172,6 @@ private:
 
   /// Cached SSD value.
   PixelType value;
-
-  /// Cached flag indicating whether this SSD is already calculated or not.
-  bool calculated;
 };
 
 
@@ -200,7 +192,6 @@ SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
   , movingTopLeftX(ctrMovingX - patchRadius)
   , movingTopLeftY(ctrMovingY - patchRadius)
   , value(0)
-  , calculated(false)
 {
   assert(idx > 0 && "SSD between patches of 0-th image in database!");
 
@@ -215,17 +206,12 @@ SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
          "Patch is outside moving image!");
 
   CalculateValue();
-
-  // After calculation we must have the 'calculated' flag set to true.
-  assert(calculated && "SSD is not calculated after construction!");
 }
 
 
 template <class DatabaseType>
 typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::GetValue() const
 {
-  assert(calculated && "Value query from an invalid SSD object!");
-
   return value;
 }
 
@@ -238,179 +224,121 @@ SSD<DatabaseType>::operator PixelType() const
 
 
 template <class DatabaseType>
-SSD<DatabaseType>::operator bool() const
-{
-  return calculated;
-}
-
-
-template <class DatabaseType>
 bool SSD<DatabaseType>::operator <(const SSD &other) const
 {
-  if (!calculated)
-    return false;
-  if (!other.calculated)
-    return true;
   return value < other.value;
 }
 
 
 template <class DatabaseType>
-bool SSD<DatabaseType>::ShiftRight()
+typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftRight()
 {
-  assert(calculated && "Shifting invalid SSD object!");
+  for (size_t dy = 0; dy < patchSide; ++dy) {
+    // Step to new place (1 px right the right side), add it.
+    PixelType diff1 =
+      (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + patchSide) -
+      (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + patchSide);
 
-  // Boundaries checks.
-  if (fixedTopLeftX + 1 + patchSide <= imageWidth &&
-      movingTopLeftX + 1 + patchSide <= imageWidth) {
-    for (size_t dy = 0; dy < patchSide; ++dy) {
-      // Step to new place (1 px right the right side), add it.
-      PixelType diff1 =
-        (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + patchSide) -
-        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + patchSide);
+    // Step from old place, subtract it (the left side).
+    PixelType diff2 =
+      (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX) -
+      (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX);
 
-      // Step from old place, subtract it (the left side).
-      PixelType diff2 =
-        (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX) -
-        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX);
-
-      value += (diff1 * diff1 - diff2 * diff2);
-    }
-    ++fixedTopLeftX;
-    ++movingTopLeftX;
-  } else {
-    calculated = false;
+    value += (diff1 * diff1 - diff2 * diff2);
   }
+  ++fixedTopLeftX;
+  ++movingTopLeftX;
 
-  return calculated;
+  return value;
 }
 
 
 template <class DatabaseType>
-bool SSD<DatabaseType>::ShiftLeft()
+typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftLeft()
 {
-  assert(calculated && "Shifting invalid SSD object!");
+  for (size_t dy = 0; dy < patchSide; ++dy) {
+    // Step to new place (1 px left the left side), add it.
+    PixelType diff1 =
+      (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX - 1) -
+      (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX - 1);
 
-  // Boundaries checks.
-  if (fixedTopLeftX > 0 && movingTopLeftX > 0) {
-    for (size_t dy = 0; dy < patchSide; ++dy) {
-      // Step to new place (1 px left the left side), add it.
-      PixelType diff1 =
-        (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX - 1) -
-        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX - 1);
+    // Step from old place, subtract it (the right side).
+    PixelType diff2 =
+      (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + patchSide - 1) -
+      (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + patchSide - 1);
 
-      // Step from old place, subtract it (the right side).
-      PixelType diff2 =
-        (*fixedImageIt)(fixedTopLeftY + dy, fixedTopLeftX + patchSide - 1) -
-        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + patchSide - 1);
-
-      value += (diff1 * diff1 - diff2 * diff2);
-    }
-    --fixedTopLeftX;
-    --movingTopLeftX;
-  } else {
-    calculated = false;
+    value += (diff1 * diff1 - diff2 * diff2);
   }
+  --fixedTopLeftX;
+  --movingTopLeftX;
 
-  return calculated;
+  return value;
 }
 
 
 template <class DatabaseType>
-bool SSD<DatabaseType>::ShiftUp()
+typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftUp()
 {
-  assert(calculated && "Shifting invalid SSD object!");
+  for (size_t dx = 0; dx < patchSide; ++dx) {
+    // Step to new place (1 px up the upper side), add it.
+    PixelType diff1 =
+      (*fixedImageIt)(fixedTopLeftY - 1, fixedTopLeftX + dx) -
+      (*movingImageIt)(movingTopLeftY - 1, movingTopLeftX + dx);
 
-  // Boundary checks.
-  if (fixedTopLeftY > 0 && movingTopLeftY > 0) {
-    for (size_t dx = 0; dx < patchSide; ++dx) {
-      // Step to new place (1 px up the upper side), add it.
-      PixelType diff1 =
-        (*fixedImageIt)(fixedTopLeftY - 1, fixedTopLeftX + dx) -
-        (*movingImageIt)(movingTopLeftY - 1, movingTopLeftX + dx);
+    // Step from old place (the lower side), subtract it.
+    PixelType diff2 =
+      (*fixedImageIt)(fixedTopLeftY + patchSide - 1, fixedTopLeftX + dx) -
+      (*movingImageIt)(movingTopLeftY + patchSide - 1, movingTopLeftX + dx);
 
-      // Step from old place (the lower side), subtract it.
-      PixelType diff2 =
-        (*fixedImageIt)(fixedTopLeftY + patchSide - 1, fixedTopLeftX + dx) -
-        (*movingImageIt)(movingTopLeftY + patchSide - 1, movingTopLeftX + dx);
-
-      value += (diff1 * diff1 - diff2 * diff2);
-    }
-    --fixedTopLeftY;
-    --movingTopLeftY;
-  } else {
-    calculated = false;
+    value += (diff1 * diff1 - diff2 * diff2);
   }
+  --fixedTopLeftY;
+  --movingTopLeftY;
 
-  return calculated;
+  return value;
 }
 
 
 template <class DatabaseType>
-bool SSD<DatabaseType>::ShiftDown()
+typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftDown()
 {
-  assert(calculated && "Shifting invalid SSD object!");
+  for (size_t dx = 0; dx < patchSide; ++dx) {
+    // Step to new place (1 px down the lower side), add it.
+    PixelType diff1 =
+      (*fixedImageIt)(fixedTopLeftY + patchSide, fixedTopLeftX + dx) -
+      (*movingImageIt)(movingTopLeftY + patchSide, movingTopLeftX + dx);
 
-  // Boundary checks.
-  if (fixedTopLeftY + 1 + patchSide <= imageHeight &&
-      movingTopLeftY + 1 + patchSide <= imageHeight) {
-    for (size_t dx = 0; dx < patchSide; ++dx) {
-      // Step to new place (1 px down the lower side), add it.
-      PixelType diff1 =
-        (*fixedImageIt)(fixedTopLeftY + patchSide, fixedTopLeftX + dx) -
-        (*movingImageIt)(movingTopLeftY + patchSide, movingTopLeftX + dx);
+    // Step from old place (upper side), subtract it.
+    PixelType diff2 =
+      (*fixedImageIt)(fixedTopLeftY, fixedTopLeftX + dx) -
+      (*movingImageIt)(movingTopLeftY, movingTopLeftX + dx);
 
-      // Step from old place (upper side), subtract it.
-      PixelType diff2 =
-        (*fixedImageIt)(fixedTopLeftY, fixedTopLeftX + dx) -
-        (*movingImageIt)(movingTopLeftY, movingTopLeftX + dx);
-
-      value += (diff1 * diff1 - diff2 * diff2);
-    }
-    ++fixedTopLeftY;
-    ++movingTopLeftY;
-  } else {
-    calculated = false;
+    value += (diff1 * diff1 - diff2 * diff2);
   }
+  ++fixedTopLeftY;
+  ++movingTopLeftY;
 
-  return calculated;
+  return value;
 }
 
 
 template <class DatabaseType>
-bool SSD<DatabaseType>::ShiftTop()
+typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftTop()
 {
-  assert(calculated && "Shifting invalid SSD object!");
+  --movingImageIt;
+  CalculateValue();
 
-  // N. B. Here we rely on the fact that fixedImageIt NEVER moves!
-  if (movingImageIt == fixedImageIt + 1) {
-    // We're already at database[1], cannot go up the base.
-    calculated = false;
-  } else {
-    --movingImageIt;
-
-    CalculateValue();
-  }
-
-  return calculated;
+  return value;
 }
 
 
 template <class DatabaseType>
-bool SSD<DatabaseType>::ShiftBottom()
+typename SSD<DatabaseType>::PixelType SSD<DatabaseType>::ShiftBottom()
 {
-  assert(calculated && "Shifting invalid SSD object!");
+  ++movingImageIt;
+  CalculateValue();
 
-  if (movingImageIt + 1 == databaseEnd) {
-    // We're at the last image in database, nowhere to go down.
-    calculated = false;
-  } else {
-    ++movingImageIt;
-
-    CalculateValue();
-  }
-
-  return calculated;
+  return value;
 }
 
 
@@ -424,7 +352,6 @@ void SSD<DatabaseType>::CalculateValue()
                        (*movingImageIt)(movingTopLeftY + dy, movingTopLeftX + dx);
       value += diff * diff;
     }
-  calculated = true;
 }
 
 
