@@ -92,66 +92,108 @@ void OPAL::ConstrainedInitialization() {
 }
 
 
-void OPAL::Propagation(size_t iteration) {
-  size_t xStart = iteration % 2 ? ImageWidth - Sets.patchRadius - 2
-                                : Sets.patchRadius;
-
-  size_t xEnd   = iteration % 2 ? Sets.patchRadius
-                                : ImageWidth - Sets.patchRadius - 2;
-
-  size_t yStart = iteration % 2 ? ImageHeight - Sets.patchRadius - 1
-                                : Sets.patchRadius;
-
-  size_t yEnd   = iteration % 2 ? Sets.patchRadius
-                                : ImageHeight - Sets.patchRadius - 1;
-
-  int    delta  = iteration % 2 ? -1 : 1;
-
+void OPAL::EvenPropagation(size_t iteration)
+{
   size_t propagatedPixels = 0;
-  for (size_t y = yStart; y != yEnd; y += delta)
-    for (size_t x = xStart; x != xEnd; x += delta) {
-      propagatedPixels += PropagatePixel(y, x, delta);
+
+  size_t xStart = Sets.patchRadius + 1;
+  size_t xEnd   = ImageWidth - Sets.patchRadius - 2;
+  size_t yStart = Sets.patchRadius + 1;
+  size_t yEnd   = ImageHeight - Sets.patchRadius - 2;
+
+  for (size_t y = yStart; y < yEnd; ++y)
+    for (size_t x = xStart; x < xEnd; ++x) {
+      propagatedPixels += PropagateRightDown(x, y);
     }
 
-  //std::cout << propagatedPixels << std::endl;
   SaveCurrentFields("Iteration_" + std::to_string(iteration));
 }
 
-//#define DUMP
+
+void OPAL::OddPropagation(size_t iteration)
+{
+  size_t propagatedPixels = 0;
+
+  size_t xStart = ImageWidth - Sets.patchRadius - 2;
+  size_t xEnd   = Sets.patchRadius + 1;
+  size_t yStart = ImageHeight - Sets.patchRadius - 2;
+  size_t yEnd   = Sets.patchRadius + 1;
+
+  for (size_t y = yStart; y > yEnd; --y)
+    for (size_t x = xStart; x > xEnd; --x) {
+      propagatedPixels += PropagateLeftUp(x, y);
+    }
+
+  SaveCurrentFields("Iteration_" + std::to_string(iteration));
+}
 
 
-int OPAL::PropagatePixel(size_t i, size_t j, int delta) {
-  SSDType current    = SSDMap(i, j);
-  SSDType vertical   = SSDMap(i + delta, j);
-  SSDType horizontal = SSDMap(i, j + delta);
+int OPAL::PropagateRightDown(size_t x, size_t y)
+{
+  size_t newX = x + 1;
+  size_t newY = y + 1;
 
-  SSDType fromVertical = vertical;
-  SSDType fromHorizontal = horizontal;
-  if (delta > 0) {
-    fromHorizontal.ShiftLeft();
-    fromVertical.ShiftUp();
-  } else {
-    fromVertical.ShiftDown();
-    fromHorizontal.ShiftRight();
-  }
+  SSDType current   = SSDMap(y, x);
+  SSDType fromDown  = SSDMap(newY, x);
+  SSDType fromRight = SSDMap(y, newX);
 
-  if (current < fromVertical && current < fromHorizontal)
+  fromDown.ShiftUp();
+  fromRight.ShiftLeft();
+
+  if (current < fromRight && current < fromDown)
     return 0;
 
-  if (fromVertical < current && fromVertical < fromHorizontal) {
-    FieldX(i, j) = FieldX(i + delta, j);
-    FieldY(i, j) = FieldY(i + delta, j);
-    FieldT(i, j) = FieldT(i + delta, j);
-    SSDMap(i, j) = fromVertical;
+  if (fromDown < current && fromDown < fromRight) {
+    FieldX(y, x) = FieldX(newY, x);
+    FieldY(y, x) = FieldY(newY, x);
+    FieldT(y, x) = FieldT(newY, x);
+    SSDMap(y, x) = fromDown;
 
     return 1;
   }
 
-  if (fromHorizontal < current && fromHorizontal < fromVertical) {
-    FieldX(i, j) = FieldX(i, j + delta);
-    FieldY(i, j) = FieldY(i, j + delta);
-    FieldT(i, j) = FieldT(i, j + delta);
-    SSDMap(i, j) = fromHorizontal;
+  if (fromRight < current && fromRight < fromDown) {
+    FieldX(y, x) = FieldX(y, newX);
+    FieldY(y, x) = FieldY(y, newX);
+    FieldT(y, x) = FieldT(y, newX);
+    SSDMap(y, x) = fromRight;
+
+    return 1;
+  }
+
+  return 0;
+}
+
+
+int OPAL::PropagateLeftUp(size_t x, size_t y)
+{
+  size_t newX = x - 1;
+  size_t newY = y - 1;
+
+  SSDType current  = SSDMap(y, x);
+  SSDType fromUp   = SSDMap(newY, x);
+  SSDType fromLeft = SSDMap(y, newX);
+
+  fromUp.ShiftDown();
+  fromLeft.ShiftRight();
+
+  if (current < fromUp && current < fromLeft)
+    return 0;
+
+  if (fromUp < current && fromUp < fromLeft) {
+    FieldX(y, x) = FieldX(newY, x);
+    FieldY(y, x) = FieldY(newY, x);
+    FieldT(y, x) = FieldT(newY, x);
+    SSDMap(y, x) = fromUp;
+
+    return 1;
+  }
+
+  if (fromLeft < current && fromLeft < fromUp) {
+    FieldX(y, x) = FieldX(y, newX);
+    FieldY(y, x) = FieldY(y, newX);
+    FieldT(y, x) = FieldT(y, newX);
+    SSDMap(y, x) = fromLeft;
 
     return 1;
   }
@@ -185,8 +227,12 @@ void OPAL::BuildSegmentation() {
 
 void OPAL::Run() {
   ConstrainedInitialization();
-  for (size_t i = 0; i < Sets.maxIterations; ++i)
-    Propagation(i);
+  for (size_t i = 0; i < Sets.maxIterations; ++i) {
+    if (i % 2 == 0)
+      EvenPropagation(i);
+    else
+      OddPropagation(i);
+  }
 
   BuildSegmentation();
 }

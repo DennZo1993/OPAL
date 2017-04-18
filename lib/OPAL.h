@@ -60,27 +60,12 @@ public:
    */
   void ConstrainedInitialization();
 
-
-  /** @brief Propagation step with fast distance computation.
-   *
-   * Second step of OPAL algorithm. Performed on each iteration.
-   *
-   * For each patch consider its neighbors to determine if they provide a
-   * better match.
-   *
-   * @param [in] iteration Index of iteration being performed.
-   */
-  void Propagation(size_t iteration);
-
-
   void BuildSegmentation();
-
 
   /// @return The result segmentation of input image.
   SegType GetOutput() const {
     return OutputSegmentation;
   }
-
 
   /**
    * @brief Run OPAL algorithm. Executes all stages successively.
@@ -142,7 +127,35 @@ private:
   FinalLabelEstimator finalLabelEstimator;
 
 private:
-  int PropagatePixel(size_t i, size_t j, int delta);
+  /**
+   * @brief Propagation step on even iterations.
+   *
+   * Goes from top-left corner of image, considering right and down neighbors.
+   */
+  void EvenPropagation(size_t iteration);
+
+  /**
+   * @brief Propagation step on odd iterations.
+   *
+   * Goes from bottom-right corner of image, considering left and up neighbors.
+   */
+  void OddPropagation(size_t iteration);
+
+  /**
+   * @brief Propagate offsets from right and down neighbors to pixel at (x,y).
+   *
+   * @param [in] x X-coordinate of pixel to update
+   * @param [in] y Y-coordinate of pixel to update
+   */
+  int PropagateRightDown(size_t x, size_t y);
+
+  /**
+   * @brief Propagate offsets from left and up neighbors to pixel at (x,y).
+   *
+   * @param [in] x X-coordinate of pixel to update
+   * @param [in] y Y-coordinate of pixel to update
+   */
+  int PropagateLeftUp(size_t x, size_t y);
 
   /// Save current displacement fields.
   void SaveCurrentFields(const std::string &fileName) const;
