@@ -63,6 +63,7 @@ def results_stats(global_times, global_scores):
     41: [0.73, 0.78],
     42: [0.75, 0.73],
     43: [0.83, 0.78],
+    44: [0.0,  0.0 ],
     46: [0.68, 0.59],
     47: [0.63, 0.60],
     49: [0.84, 0.81],
@@ -83,7 +84,7 @@ def results_stats(global_times, global_scores):
     median_scores[label] = statistics.median(score_list)
 
   print('{:<13}{:<13}{:<13}{:<13}{:<13}{:<13}{:<13}'.format(
-          'Label', 'Min', 'Max', 'Mean', 'Median', 'vs. KeyPoints', 'vs. SyN')
+          'Label', 'Min', 'Max', 'Mean', 'Median', 'vs. Points', 'vs. SyN')
        )
   for label in sorted(global_scores.keys()):
     if label < 2:
@@ -105,4 +106,4 @@ def results_stats(global_times, global_scores):
             vs_syn)
          )
 
-  print(mean_running_time)
+  print('\nMean running time: {t}'.format(t=mean_running_time))

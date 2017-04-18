@@ -6,11 +6,11 @@ def make_opal_config(config_file, **kwargs):
 
 def make_default_opal_config(config_file):
   opal_settings = {
-    'initWindowRadius': '15',
-    'patchRadius': 6,
+    'initWindowRadius': '5',
+    'patchRadius': '10',
     'intermediateSaving': 'false',
     'intermediateSavingPath': '',
-    'maxIterations': '30',
+    'maxIterations': '50',
   }
 
   make_opal_config(config_file, **opal_settings) 
