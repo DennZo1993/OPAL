@@ -2,18 +2,18 @@ language: cpp
 
 matrix:
   include:
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
-          packages:
-            - gcc-4.9
-            - g++-4.9
-            - cmake
-            - cmake-data
-      env: C_COMPILER=gcc-4.9 CXX_COMPILER=g++-4.9 GTEST_COLOR=1 BUILD_TYPE=Release
+    #- compiler: gcc
+    #  addons:
+    #    apt:
+    #      sources:
+    #        - ubuntu-toolchain-r-test
+    #        - george-edison55-precise-backports
+    #      packages:
+    #        - gcc-4.9
+    #        - g++-4.9
+    #        - cmake
+    #        - cmake-data
+    #  env: C_COMPILER=gcc-4.9 CXX_COMPILER=g++-4.9 GTEST_COLOR=1 BUILD_TYPE=Release
 
     - compiler: gcc
       addons:
@@ -28,18 +28,18 @@ matrix:
             - cmake-data
       env: C_COMPILER=gcc-5 CXX_COMPILER=g++-5 GTEST_COLOR=1 LCOV="lcov-1.12/bin/lcov" BUILD_TYPE=Coverage
 
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.8
-            - george-edison55-precise-backports
-          packages:
-            - clang-3.8
-            - cmake
-            - cmake-data
-      env: C_COMPILER=clang-3.8 CXX_COMPILER=clang++-3.8 GTEST_COLOR=1 BUILD_TYPE=Release
+    #- compiler: clang
+    #  addons:
+    #    apt:
+    #      sources:
+    #        - ubuntu-toolchain-r-test
+    #        - llvm-toolchain-precise-3.8
+    #        - george-edison55-precise-backports
+    #      packages:
+    #        - clang-3.8
+    #        - cmake
+    #        - cmake-data
+    #  env: C_COMPILER=clang-3.8 CXX_COMPILER=clang++-3.8 GTEST_COLOR=1 BUILD_TYPE=Release
 
 install:
   - |
