@@ -25,12 +25,12 @@
  * Needs only index of a single image in database (>= 1) because the other image
  * is always Database[0] (image to be segmented).
  *
- * @tparam DatabaseType Type of image database. Must be ImageDatabase.
+ * @tparam TDb Type of image database. Must be ImageDatabase.
  */
-template <class DatabaseType>
+template <class TDb>
 class SSD {
 public:
-  using ValueType = typename DatabaseType::ImgPixelType;
+  using ValueType = typename TDb::ImgPixelType;
 
 public:
   // Constructors and destructors.
@@ -52,7 +52,7 @@ public:
    * @param [in] ctrMovingY Y-coordinate of center of patch on moving image
    * @param [in] radius Radius of patches
    */
-  SSD(const DatabaseType &db, size_t idx,
+  SSD(const TDb &db, size_t idx,
       size_t ctrFixedX, size_t ctrFixedY, size_t ctrMovingX, size_t ctrMovingY,
       size_t radius);
 
@@ -138,13 +138,13 @@ private:
 
 private:
   /// Fixed image iterator. Doesn't move, always img_cbegin().
-  typename DatabaseType::ConstImgIterator fixedImageIt;
+  typename TDb::ConstImgIterator fixedImageIt;
 
   /// Moving image iterator (img_cbegin() + movingIndex).
-  typename DatabaseType::ConstImgIterator movingImageIt;
+  typename TDb::ConstImgIterator movingImageIt;
 
   /// Iterator pointing at the end of database.
-  typename DatabaseType::ConstImgIterator databaseEnd;
+  typename TDb::ConstImgIterator databaseEnd;
 
   /// Side of patch. patchSize = 2 * patchRadius + 1.
   size_t patchSide;
@@ -168,11 +168,11 @@ private:
 
 // ===== Implementation below =====
 
-template <class DatabaseType>
-SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
-                       size_t ctrFixedX, size_t ctrFixedY,
-                       size_t ctrMovingX, size_t ctrMovingY,
-                       size_t radius)
+template <class TDb>
+SSD<TDb>::SSD(const TDb &db, size_t idx,
+              size_t ctrFixedX, size_t ctrFixedY,
+              size_t ctrMovingX, size_t ctrMovingY,
+              size_t radius)
   : fixedImageIt(db.img_cbegin())
   , movingImageIt(db.img_cbegin() + idx)
   , databaseEnd(db.img_cend())
@@ -189,29 +189,29 @@ SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
 }
 
 
-template <class DatabaseType>
-typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::GetValue() const
+template <class TDb>
+typename SSD<TDb>::ValueType SSD<TDb>::GetValue() const
 {
   return value;
 }
 
 
-template <class DatabaseType>
-SSD<DatabaseType>::operator ValueType() const
+template <class TDb>
+SSD<TDb>::operator ValueType() const
 {
   return GetValue();
 }
 
 
-template <class DatabaseType>
-bool SSD<DatabaseType>::operator <(const SSD &other) const
+template <class TDb>
+bool SSD<TDb>::operator <(const SSD &other) const
 {
   return value < other.value;
 }
 
 
-template <class DatabaseType>
-typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftRight()
+template <class TDb>
+typename SSD<TDb>::ValueType SSD<TDb>::ShiftRight()
 {
   for (size_t dy = 0; dy < patchSide; ++dy) {
     // Step to new place (1 px right the right side), add it.
@@ -233,8 +233,8 @@ typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftRight()
 }
 
 
-template <class DatabaseType>
-typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftLeft()
+template <class TDb>
+typename SSD<TDb>::ValueType SSD<TDb>::ShiftLeft()
 {
   for (size_t dy = 0; dy < patchSide; ++dy) {
     // Step to new place (1 px left the left side), add it.
@@ -256,8 +256,8 @@ typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftLeft()
 }
 
 
-template <class DatabaseType>
-typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftUp()
+template <class TDb>
+typename SSD<TDb>::ValueType SSD<TDb>::ShiftUp()
 {
   for (size_t dx = 0; dx < patchSide; ++dx) {
     // Step to new place (1 px up the upper side), add it.
@@ -279,8 +279,8 @@ typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftUp()
 }
 
 
-template <class DatabaseType>
-typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftDown()
+template <class TDb>
+typename SSD<TDb>::ValueType SSD<TDb>::ShiftDown()
 {
   for (size_t dx = 0; dx < patchSide; ++dx) {
     // Step to new place (1 px down the lower side), add it.
@@ -302,8 +302,8 @@ typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftDown()
 }
 
 
-template <class DatabaseType>
-typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftTop()
+template <class TDb>
+typename SSD<TDb>::ValueType SSD<TDb>::ShiftTop()
 {
   --movingImageIt;
   CalculateValue();
@@ -312,8 +312,8 @@ typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftTop()
 }
 
 
-template <class DatabaseType>
-typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftBottom()
+template <class TDb>
+typename SSD<TDb>::ValueType SSD<TDb>::ShiftBottom()
 {
   ++movingImageIt;
   CalculateValue();
@@ -322,8 +322,8 @@ typename SSD<DatabaseType>::ValueType SSD<DatabaseType>::ShiftBottom()
 }
 
 
-template <class DatabaseType>
-void SSD<DatabaseType>::CalculateValue()
+template <class TDb>
+void SSD<TDb>::CalculateValue()
 {
   value = 0;
   for (size_t dy = 0; dy < patchSide; ++dy)
