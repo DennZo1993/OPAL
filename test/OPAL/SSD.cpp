@@ -31,17 +31,6 @@ protected:
 SSDShiftTest::DatabaseType SSDShiftTest::db;
 
 
-TEST_F(SSDShiftTest, ConstructionBad1) {
-  auto creator = []() {
-    SSD<DatabaseType> ssd(db, /*idx*/1, /*fix*/2, 2, /*mov*/1, 3, /*radius*/2);
-  };
-
-#ifndef NDEBUG
-  ASSERT_DEATH(creator(), "Patch is outside moving image!");
-#endif
-}
-
-
 TEST_F(SSDShiftTest, ShiftTop1) {
   SSD<DatabaseType> ssd(db, /*idx=*/ 1, /*fix*/2, 2,/*mov*/1, 3, /*radius=*/ 1);
 
