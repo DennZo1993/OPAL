@@ -146,9 +146,6 @@ private:
   /// Iterator pointing at the end of database.
   typename DatabaseType::ConstImgIterator databaseEnd;
 
-  /// Radius of patch (parameter).
-  size_t patchRadius;
-
   /// Side of patch. patchSize = 2 * patchRadius + 1.
   size_t patchSide;
 
@@ -163,12 +160,6 @@ private:
 
   /// Y-coordinate of top-left corner of patch on moving image.
   size_t movingTopLeftY;
-
-  /// Cached height of images.
-  size_t imageHeight;
-
-  /// Cached width of images.
-  size_t imageWidth;
 
   /// Cached SSD value.
   ValueType value;
@@ -185,25 +176,14 @@ SSD<DatabaseType>::SSD(const DatabaseType &db, size_t idx,
   : fixedImageIt(db.img_cbegin())
   , movingImageIt(db.img_cbegin() + idx)
   , databaseEnd(db.img_cend())
-  , patchRadius(radius)
-  , patchSide(2 * patchRadius + 1)
-  , fixedTopLeftX(ctrFixedX - patchRadius)
-  , fixedTopLeftY(ctrFixedY - patchRadius)
-  , movingTopLeftX(ctrMovingX - patchRadius)
-  , movingTopLeftY(ctrMovingY - patchRadius)
+  , patchSide(2 * radius + 1)
+  , fixedTopLeftX(ctrFixedX - radius)
+  , fixedTopLeftY(ctrFixedY - radius)
+  , movingTopLeftX(ctrMovingX - radius)
+  , movingTopLeftY(ctrMovingY - radius)
   , value(0)
 {
   assert(idx > 0 && "SSD between patches of 0-th image in database!");
-
-  imageHeight = db.GetImageHeight();
-  imageWidth  = db.GetImageWidth();
-
-  // If we try to construct a new SSD, be sure we pass the correct arguments to
-  // calculate it.
-  assert(PatchInsideImage(fixedTopLeftX, fixedTopLeftY) &&
-         "Patch is outside fixed image!");
-  assert(PatchInsideImage(movingTopLeftX, movingTopLeftY) &&
-         "Patch is outside moving image!");
 
   CalculateValue();
 }
@@ -354,11 +334,3 @@ void SSD<DatabaseType>::CalculateValue()
     }
 }
 
-
-template <class DatabaseType>
-bool SSD<DatabaseType>::PatchInsideImage(const size_t x, const size_t y)
-{
-  // x and y are coordinates of top-left corner of a patch.
-  // Because of size_t type we don't need to check that x >= 0 and y >= 0.
-  return (x + patchSide <= imageWidth) && (y + patchSide <= imageHeight);
-}
