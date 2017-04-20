@@ -35,7 +35,7 @@ cd OPAL
 #### Build
 - **Using build script (requires Python)**  
   ```bash
-  python opal_build.py
+  python scripts/opal_build.py
   ```
   Arguments to control build:
   ```
@@ -46,15 +46,15 @@ cd OPAL
   ```
   To see all supported options, run
   ```
-  python opal_build.py --help
+  python scripts/opal_build.py --help
   ```
   **Example:** "Release" build on Windows using Visual C++ compiler (cl)
   ```
-  python opal_build.py -c cl -r
+  python scripts/opal_build.py -c cl -r
   ```
   **Example:** "Debug" build on Linux with Clang, clearing previous data
   ```
-  python opal_build.py -c clang++ -d --clear
+  python scripts/opal_build.py -c clang++ -d --clear
   ```
   The script will create `build` directory containing built libraries and binaries.
   
@@ -93,13 +93,13 @@ cd OPAL
 
 - **Using build script (requires Python)**  
   ```bash
-  python opal_build.py --test
+  python scripts/opal_build.py --test
   ```
   Pass `--verbose` option (short: `-v`) to see verbose output.
   
   **Example:** Build and test "Release" version with verbose output
   ```
-  python opal_build.py --release --test --verbose
+  python scripts/opal_build.py --release --test --verbose
   ```
 
 - **Manual run**  
