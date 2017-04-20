@@ -294,7 +294,7 @@ typename SSD<TDb>::ValueType SSD<TDb>::ShiftDown()
 
 
 template <class TDb>
-typename SSD<TDb>::ValueType SSD<TDb>::ShiftImage(const SSD<TDb>::ImgType *img)
+typename SSD<TDb>::ValueType SSD<TDb>::ShiftImage(const typename SSD<TDb>::ImgType *img)
 {
   assert(img && "New image pointer is null!");
 
