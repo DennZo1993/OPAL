@@ -143,9 +143,6 @@ private:
   /// Moving image iterator (img_cbegin() + movingIndex).
   typename TDb::ConstImgIterator movingImageIt;
 
-  /// Iterator pointing at the end of database.
-  typename TDb::ConstImgIterator databaseEnd;
-
   /// Side of patch. patchSize = 2 * patchRadius + 1.
   size_t patchSide;
 
@@ -175,7 +172,6 @@ SSD<TDb>::SSD(const TDb &db, size_t idx,
               size_t radius)
   : fixedImageIt(db.img_cbegin())
   , movingImageIt(db.img_cbegin() + idx)
-  , databaseEnd(db.img_cend())
   , patchSide(2 * radius + 1)
   , fixedTopLeftX(ctrFixedX - radius)
   , fixedTopLeftY(ctrFixedY - radius)
