@@ -45,11 +45,11 @@ TEST_F(SSDShiftTest, ShiftTop2) {
   ASSERT_TRUE(ssd);
   ASSERT_EQ(81, ssd.GetValue());
 
-  ssd.ShiftTop();
+  ssd.ShiftImage(&db.GetImage(2));
   ASSERT_TRUE(ssd);
   ASSERT_EQ(36, ssd.GetValue());
 
-  ssd.ShiftTop();
+  ssd.ShiftImage(&db.GetImage(1));
   ASSERT_TRUE(ssd);
   ASSERT_EQ(9, ssd.GetValue());
 }
@@ -69,11 +69,11 @@ TEST_F(SSDShiftTest, ShiftBottom2) {
   ASSERT_TRUE(ssd);
   ASSERT_EQ(9, ssd.GetValue());
 
-  ssd.ShiftBottom();
+  ssd.ShiftImage(&db.GetImage(2));
   ASSERT_TRUE(ssd);
   ASSERT_EQ(36, ssd.GetValue());
 
-  ssd.ShiftBottom();
+  ssd.ShiftImage(&db.GetImage(3));
   ASSERT_TRUE(ssd);
   ASSERT_EQ(81, ssd.GetValue());
 }

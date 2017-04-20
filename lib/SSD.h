@@ -31,6 +31,7 @@ template <class TDb>
 class SSD {
 public:
   using ValueType = typename TDb::ImgPixelType;
+  using ImgType   = typename TDb::ImgType;
 
 public:
   // Constructors and destructors.
@@ -64,17 +65,17 @@ public:
   /**
    * @returns Value of calculated SSD.
    */
-  ValueType GetValue() const;
+  inline ValueType GetValue() const;
 
   /**
    * @returns Retult of GetValue().
    */
-  operator ValueType() const;
+  inline operator ValueType() const;
 
   /**
    * @todo Documentation.
    */
-  bool operator <(const SSD &other) const;
+  inline bool operator <(const SSD &other) const;
 
 public:
   // Methods for efficient update.
@@ -108,18 +109,11 @@ public:
   ValueType ShiftDown();
 
   /**
-   * @brief Same (x,y) coordinates on database[movingIndex - 1].
+   * @brief Same (x,y) coordinates on image img.
    *
    * @returns Calculated flag.
    */
-  ValueType ShiftTop();
-
-  /**
-   * @brief Same (x,y) coordinates on database[movingIndex + 1].
-   *
-   * @returns Calculated flag.
-   */
-  ValueType ShiftBottom();
+  ValueType ShiftImage(const ImgType *img);
 
 private:
 
@@ -137,11 +131,11 @@ private:
   bool PatchInsideImage(const size_t x, const size_t y);
 
 private:
-  /// Fixed image iterator. Doesn't move, always img_cbegin().
-  typename TDb::ConstImgIterator fixedImageIt;
+  /// Pointer to fixed image.
+  const ImgType *fixedImageIt;
 
-  /// Moving image iterator (img_cbegin() + movingIndex).
-  typename TDb::ConstImgIterator movingImageIt;
+  /// Pointer to moving image.
+  const ImgType *movingImageIt;
 
   /// Side of patch. patchSize = 2 * patchRadius + 1.
   size_t patchSide;
@@ -170,8 +164,8 @@ SSD<TDb>::SSD(const TDb &db, size_t idx,
               size_t ctrFixedX, size_t ctrFixedY,
               size_t ctrMovingX, size_t ctrMovingY,
               size_t radius)
-  : fixedImageIt(db.img_cbegin())
-  , movingImageIt(db.img_cbegin() + idx)
+  : fixedImageIt(&db.GetImage(0))
+  , movingImageIt(&db.GetImage(idx))
   , patchSide(2 * radius + 1)
   , fixedTopLeftX(ctrFixedX - radius)
   , fixedTopLeftY(ctrFixedY - radius)
@@ -180,6 +174,7 @@ SSD<TDb>::SSD(const TDb &db, size_t idx,
   , value(0)
 {
   assert(idx > 0 && "SSD between patches of 0-th image in database!");
+  assert(fixedImageIt && movingImageIt && "One of image pointers is null!");
 
   CalculateValue();
 }
@@ -299,19 +294,11 @@ typename SSD<TDb>::ValueType SSD<TDb>::ShiftDown()
 
 
 template <class TDb>
-typename SSD<TDb>::ValueType SSD<TDb>::ShiftTop()
+typename SSD<TDb>::ValueType SSD<TDb>::ShiftImage(const SSD<TDb>::ImgType *img)
 {
-  --movingImageIt;
-  CalculateValue();
+  assert(img && "New image pointer is null!");
 
-  return value;
-}
-
-
-template <class TDb>
-typename SSD<TDb>::ValueType SSD<TDb>::ShiftBottom()
-{
-  ++movingImageIt;
+  movingImageIt = img;
   CalculateValue();
 
   return value;
