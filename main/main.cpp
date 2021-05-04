@@ -20,6 +20,8 @@
  */
 
 
+ // Pushystique
+ 
 #include "OPAL.h"
 #include "ImageIO.h"
 #include "SegmentationColorsConverter.h"
